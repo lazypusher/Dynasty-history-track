@@ -1,0 +1,1311 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>唐朝 289 年 · 主线</title>
+<style>
+  :root{
+    --paper:#f3ebe0; --paper2:#faf5ec; --ink:#211b17; --ink2:#5c4d42;
+    --red:#b23a2e; --gold:#b98a35; --jade:#2f6b57; --slate:#3f5566; --indigo:#4d5480;
+    --line:#d9cab5;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:
+      radial-gradient(circle at 15% -5%, #fcf7ef 0%, transparent 50%),
+      radial-gradient(circle at 95% 105%, #eee0cc 0%, transparent 45%),
+      var(--paper);
+    color:var(--ink);
+    font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",SimSun,"STSong",serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px 90px}
+
+  /* ---------- top bar ---------- */
+  header{
+    position:sticky;top:0;z-index:30;background:rgba(243,235,224,.92);
+    backdrop-filter:blur(6px);border-bottom:1px solid var(--line);
+  }
+  .hbar{max-width:1120px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px}
+  .seal{
+    width:34px;height:34px;border-radius:7px;background:var(--red);color:#fff;
+    display:grid;place-items:center;font-size:17px;box-shadow:0 2px 0 #8d2b21;flex:0 0 auto;
+  }
+  .ttl{font-size:16px;letter-spacing:1px;line-height:1.15}
+  .ttl small{display:block;font-size:11px;color:var(--ink2);letter-spacing:2px;margin-top:2px}
+  .dots{display:flex;gap:6px;margin-left:auto}
+  .dot{
+    width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:#fff;
+    font-family:inherit;font-size:11px;color:var(--ink2);cursor:pointer;transition:.15s;
+  }
+  .dot:hover{border-color:var(--gold);color:var(--gold)}
+  .dot.on{background:var(--ink);border-color:var(--ink);color:#f6eee2}
+  .nav{display:flex;gap:6px;margin-left:8px}
+  .nav button{background:#fff;border:1px solid var(--line);border-radius:8px;width:28px;height:28px;cursor:pointer;color:var(--ink2);font-family:inherit;font-size:13px}
+  .nav button:hover{border-color:var(--gold);color:var(--gold)}
+
+  /* ---------- succession timeline ---------- */
+  .succ{margin:26px 0 36px}
+  .sechead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .sechead h2{font-size:19px;letter-spacing:3px;margin:0;font-weight:600}
+  .sechead .hint{font-size:12px;color:var(--ink2)}
+  .secstat{font-size:12.5px;color:var(--ink2);margin:0 0 22px;letter-spacing:.3px}
+  .secstat b{color:var(--red);font-size:15px;padding:0 2px}
+  .tlwrap{position:relative;margin-top:4px}
+  .tlwrap::before{
+    content:"";position:absolute;left:50%;top:8px;bottom:8px;width:2px;margin-left:-1px;
+    background:linear-gradient(180deg,rgba(217,202,181,0) 0,var(--line) 3%,var(--line) 97%,rgba(217,202,181,0) 100%);
+  }
+  .tl-item{
+    display:grid;grid-template-columns:1fr 64px 1fr;align-items:start;
+    background:none;border:none;font-family:inherit;color:inherit;cursor:pointer;
+    padding:0;margin:0 0 6px;text-align:left;width:100%;
+  }
+  .tl-item .tl-mid{grid-column:2;grid-row:1;display:flex;justify-content:center;padding-top:12px}
+  .tl-item .tdot{
+    width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #b9a68c;
+    transition:box-shadow .15s,transform .15s;position:relative;z-index:2;
+  }
+  .tl-item.ab .tdot{background:var(--red);border-color:var(--red)}
+  .tl-item:hover .tdot{box-shadow:0 0 0 5px rgba(185,138,53,.16);transform:scale(1.12)}
+  .tl-item .tl-card{
+    grid-row:1;position:relative;max-width:404px;min-width:186px;padding:9px 13px 10px;
+    border:1px solid var(--line);border-radius:12px;background:var(--tint,var(--paper2));
+    transition:transform .13s,box-shadow .15s,border-color .15s;
+  }
+  .tl-item.L .tl-card{grid-column:1;justify-self:end;text-align:right;border-right:3px solid var(--accent,#d9cab5)}
+  .tl-item.R .tl-card{grid-column:3;justify-self:start;text-align:left;border-left:3px solid var(--accent,#d9cab5)}
+  .tl-item:hover .tl-card{transform:translateY(-1px);box-shadow:0 6px 16px rgba(90,60,30,.1);border-color:var(--gold)}
+  .tl-item.L .tl-card::after,
+  .tl-item.R .tl-card::after{content:"";position:absolute;top:17px;width:26px;height:1.5px;background:#bda183}
+  .tl-item.L .tl-card::after{right:-31px}
+  .tl-item.R .tl-card::after{left:-31px}
+  .tl-item .row1{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;line-height:1.4}
+  .tl-item.L .row1{justify-content:flex-end}
+  .tl-item .yr{font-size:11px;letter-spacing:.2px;color:#96703c;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .tl-item .nm{display:inline-flex;align-items:baseline;gap:5px;font-size:15px;letter-spacing:.5px;color:var(--ink)}
+  .tl-item .nm b{font-weight:600}
+  .tl-item .nm .pn{font-size:13px;color:var(--ink2);letter-spacing:1px}
+  .tl-item .al{
+    font-size:10.5px;color:#8a5c33;border:1px solid #dcc3a4;background:#fdf6ec;
+    border-radius:4px;padding:0 5px;letter-spacing:.5px;white-space:nowrap;
+    display:inline-block;vertical-align:1px;
+  }
+  .tl-item .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+  .tl-item.L .tags{justify-content:flex-end}
+  .tl-item .tg{font-size:10.5px;color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:999px;padding:1px 8px;white-space:nowrap}
+  .tl-item.sheng{--accent:#8cb3a3;--tint:#f0f6f2}
+  .tl-item.luan{--accent:#cb9086;--tint:#fbf0ed}
+  .tl-item.wen{--accent:#c8b79c;--tint:var(--paper2)}
+  .tlegend{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0 0;font-size:11.5px;color:var(--ink2);justify-content:center}
+  .tlegend i{display:inline-block;width:22px;height:9px;border-radius:3px;margin-right:6px;vertical-align:0;border:1px solid var(--line)}
+  .tlegend .pt{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);margin-right:6px;vertical-align:1px}
+  .jump{display:block;margin:24px auto 0;background:none;border:1px solid var(--line);border-radius:999px;
+    padding:7px 18px;font-family:inherit;font-size:12.5px;color:var(--ink2);cursor:pointer;letter-spacing:1px}
+  .jump:hover{border-color:var(--gold);color:var(--gold)}
+
+  /* ---------- chapters ---------- */
+  main{min-width:0}
+  .intro{
+    border-left:3px solid var(--line);padding:2px 0 2px 14px;margin:0 0 26px;
+    color:var(--ink2);font-size:13.5px;line-height:1.8;
+  }
+  .intro p{margin:0 0 6px}
+  .intro b{color:var(--ink)}
+  .intro kbd{
+    font-family:inherit;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;
+    padding:0 5px;font-size:11.5px;background:#fff;color:var(--ink2);
+  }
+  .filters{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 24px}
+  .fchip{
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 13px;
+    font-size:12.5px;cursor:pointer;font-family:inherit;color:var(--ink2);transition:.15s;
+  }
+  .fchip:hover{border-color:var(--gold);color:var(--gold)}
+  .fchip.on{background:var(--ink);border-color:var(--ink);color:#f6eee2}
+  body[data-f]:not([data-f=""]) .it{opacity:.18;filter:grayscale(.7);transition:opacity .2s}
+  body[data-f="emp"] .it.k-emp,
+  body[data-f="pow"] .it.k-pow,
+  body[data-f="war"] .it.k-war,
+  body[data-f="ppl"] .it.k-ppl,
+  body[data-f="cul"] .it.k-cul,
+  body[data-f="rel"] .it.k-rel{opacity:1;filter:none}
+  .ch{padding:8px 0 30px;scroll-margin-top:80px;border-bottom:1px dashed var(--line)}
+  .ch:last-child{border-bottom:none}
+  .chhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .chy{font-size:12px;letter-spacing:2px;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:2px 9px}
+  .rulerow{display:flex;flex-wrap:wrap;gap:5px;margin-left:auto}
+  .rchip{font-size:11px;color:var(--ink2);border:1px solid var(--line);background:#fff;border-radius:999px;padding:1px 8px;white-space:nowrap}
+  .cht{font-size:23px;letter-spacing:1px;margin:6px 0 0;font-weight:600}
+  .chlead{margin:12px 0 20px;font-size:15px;line-height:1.85;color:var(--ink2);max-width:62ch}
+  .chlead b{color:var(--ink);font-weight:600}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:10px}
+  .it{
+    display:block;width:100%;text-align:left;background:var(--paper2);border:1px solid var(--line);
+    border-radius:11px;padding:11px 13px 10px;cursor:pointer;font-family:inherit;color:inherit;
+    transition:transform .12s,box-shadow .15s,border-color .15s;position:relative;
+  }
+  .it:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(90,60,30,.12);border-color:var(--gold)}
+  .it .top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+  .it .iy{font-size:11px;letter-spacing:1px;color:var(--gold);font-variant-numeric:tabular-nums}
+  .it .ik{font-size:10px;border-radius:4px;padding:1px 5px;margin-left:auto;color:#fff}
+  .it .it-t{font-size:15px;letter-spacing:.5px;line-height:1.4;display:block}
+  .it .it-d{font-size:12.5px;line-height:1.6;color:var(--ink2);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .k-emp .ik{background:var(--red)} .k-emp{border-left:3px solid var(--red)}
+  .k-pow .ik{background:var(--gold)} .k-pow{border-left:3px solid var(--gold)}
+  .k-war .ik{background:var(--slate)} .k-war{border-left:3px solid var(--slate)}
+  .k-ppl .ik{background:var(--jade)} .k-ppl{border-left:3px solid var(--jade)}
+  .k-cul .ik{background:var(--indigo)} .k-cul{border-left:3px solid var(--indigo)}
+  .k-rel .ik{background:#7d5632} .k-rel{border-left:3px solid #7d5632}
+  .it-mus{display:block;font-size:11px;color:#8a6a45;margin-top:5px;letter-spacing:.2px}
+  .it-mus::before{content:"◈ ";opacity:.7}
+  .mlabel{
+    position:relative;overflow:hidden;display:flex;gap:14px;align-items:flex-start;
+    padding:14px 16px;margin:0 0 16px;border:1px solid #e0cdb2;border-radius:12px;
+    background:linear-gradient(135deg,#fdf9f2,#f6ecdb);
+  }
+  .mglyph{position:absolute;right:4px;bottom:-22px;font-size:104px;line-height:1;color:#8c6239;opacity:.10;pointer-events:none}
+  .mfacts{position:relative;z-index:1}
+  .mname{font-size:19px;letter-spacing:1px;margin-bottom:7px}
+  .mrow{display:flex;gap:10px;font-size:12.5px;line-height:1.95}
+  .mrow .mk{color:#a9834a;flex:0 0 auto;min-width:34px}
+  .mrow .mv{color:var(--ink2)}
+  .mtext{font-size:15px;line-height:1.95}
+  .mart{display:inline-block;margin-top:7px;font-size:12px;color:#8a6a45;text-decoration:none;border-bottom:1px dashed #c9ab84}
+  .mart:hover{color:var(--red);border-color:var(--red)}
+  .mfig{position:relative;flex:0 0 148px;width:148px;height:112px;border-radius:9px;overflow:hidden;
+    background:#efe3d0;cursor:zoom-in;display:grid;place-items:center;border:1px solid #e0cdb2}
+  .mfig img{width:100%;height:100%;object-fit:cover;display:block}
+  .mfig .mfig-ph{font-size:38px;color:#b99b74;line-height:1;display:none;letter-spacing:0}
+  .mfig.noimg{cursor:default}
+  .mfig.noimg img{display:none}
+  .mfig.noimg .mfig-ph{display:block}
+  .lightbox{position:fixed;inset:0;z-index:80;background:rgba(18,13,9,.95);display:none;
+    flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:26px}
+  .lightbox.on{display:flex}
+  .lightbox img{max-width:92vw;max-height:78vh;border-radius:6px;background:#1b1512;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+  .lb-cap{color:#e8dccb;font-size:13px;letter-spacing:1px;text-align:center}
+  .lb-cap a{color:#d8b477;margin-left:10px;text-decoration:none;border-bottom:1px dashed rgba(216,180,119,.5)}
+  .lb-close{position:absolute;top:12px;right:18px;background:none;border:none;color:#e8dccb;font-size:30px;line-height:1;cursor:pointer;font-family:inherit}
+  @media (max-width:560px){
+    .mfig{flex:0 0 auto;width:100%;height:170px;margin-bottom:10px}
+  }
+
+  .chain{margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12.5px}
+  .chain .cl{font-size:11px;letter-spacing:2px;color:var(--gold);margin-right:2px}
+  .chain .nd{background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--ink2)}
+  .chain .ar{color:#c0ab90}
+
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 0;font-size:12px;color:var(--ink2)}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:0}
+
+  /* ---------- modal ---------- */
+  .mask{
+    position:fixed;inset:0;background:rgba(30,22,16,.42);display:none;z-index:50;
+    align-items:center;justify-content:center;padding:20px;
+  }
+  .mask.on{display:flex}
+  .modal{
+    background:var(--paper2);border-radius:16px;max-width:540px;width:100%;max-height:82vh;overflow:auto;
+    padding:24px 24px 20px;box-shadow:0 20px 60px rgba(30,20,10,.35);animation:pop .18s ease;
+  }
+  @keyframes pop{from{transform:translateY(10px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+  .mhead{display:flex;align-items:flex-start;gap:10px}
+  .mhead h3{margin:0;font-size:21px;letter-spacing:.5px;line-height:1.4}
+  .mclose{margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink2);font-family:inherit;line-height:1}
+  .mmeta{margin:8px 0 14px;font-size:12px;color:var(--gold);letter-spacing:1px}
+  .mbody{font-size:15px;line-height:1.9;color:var(--ink)}
+  .mrel{margin-top:20px;border-top:1px solid var(--line);padding-top:12px}
+  .mrel .rl{font-size:11px;letter-spacing:2px;color:var(--gold);margin-bottom:8px}
+  .mrel .tags{display:flex;flex-wrap:wrap;gap:6px}
+  .mrel .tag{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:12.5px;cursor:pointer;font-family:inherit;color:var(--ink2)}
+  .mrel .tag:hover{border-color:var(--gold);color:var(--gold)}
+
+  @media (max-width:900px){
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .dot{width:22px;height:22px;font-size:10px}
+    .ttl small{display:none}
+  }
+  /* 窄屏：轴线回到左侧，单列 */
+  @media (max-width:820px){
+    .tlwrap::before{left:15px;margin-left:0}
+    .tl-item{grid-template-columns:32px minmax(0,1fr);margin-bottom:8px}
+    .tl-item .tl-mid{grid-column:1;grid-row:1;justify-content:flex-start;padding-top:13px;padding-left:9px}
+    .tl-item.L .tl-card,.tl-item.R .tl-card{
+      grid-column:2;justify-self:stretch;max-width:none;text-align:left;
+      border-right:1px solid var(--line);border-left:3px solid var(--accent,#d9cab5);
+    }
+    .tl-item.L .row1,.tl-item.L .tags{justify-content:flex-start}
+    .tl-item.L .tl-card::after,.tl-item.R .tl-card::after{
+      left:-17px;right:auto;width:15px;
+    }
+  }
+  @media (max-width:560px){
+    .dots{display:none}
+    .grid{grid-template-columns:minmax(0,1fr)}
+    .cht{font-size:20px}
+    .rulerow{margin-left:0;width:100%}
+  }
+  /* ---------- 闯关 sheet ---------- */
+  .playbtn{background:var(--ink);color:#f6eee2;border:none;border-radius:999px;padding:6px 13px;
+    font-family:inherit;font-size:12px;letter-spacing:1px;cursor:pointer;margin-left:10px}
+  .playbtn:hover{background:#3a2f26}
+  .quizchip{margin-left:10px;background:#fff;border:1px solid var(--line);border-radius:999px;
+    padding:2px 10px;font-family:inherit;font-size:11px;color:var(--ink2);cursor:pointer;white-space:nowrap}
+  .quizchip:hover{border-color:var(--gold);color:var(--gold)}
+  .sheet{position:fixed;inset:0;background:rgba(30,22,16,.5);z-index:60;display:none;overflow:auto;padding:16px}
+  .sheet.on{display:block}
+  .sheet-in{max-width:640px;margin:20px auto;background:var(--paper);border-radius:18px;
+    padding:14px 18px 20px;box-shadow:0 24px 70px rgba(20,12,6,.42)}
+  .sheet-top{display:flex;align-items:center;margin-bottom:10px}
+  .sheet-title{font-size:13px;letter-spacing:3px;color:var(--gold)}
+  .sheet-close{margin-left:auto;background:none;border:none;font-size:22px;line-height:1;color:var(--ink2);cursor:pointer;font-family:inherit}
+  .view{display:none}
+  .view.on{display:block;animation:fadein .18s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .vsub{font-size:12.5px;color:var(--ink2);line-height:1.7;margin:0 0 14px}
+  .gcards{display:grid;gap:9px}
+  .gcard{display:flex;gap:12px;align-items:flex-start;text-align:left;background:var(--paper2);
+    border:1px solid var(--line);border-radius:12px;padding:13px;cursor:pointer;font-family:inherit;color:inherit;transition:.13s}
+  .gcard:hover{border-color:var(--gold);transform:translateY(-1px)}
+  .gcard .gi{flex:0 0 auto;width:34px;height:34px;border:1px solid var(--red);color:var(--red);
+    border-radius:7px;display:grid;place-items:center;font-size:16px;background:#fff8f4}
+  .gcard .gt{display:block;font-size:15px;letter-spacing:1px}
+  .gcard .gd{display:block;font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5}
+  .qmeta{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--ink2);margin-bottom:7px}
+  .qtime{color:var(--gold);font-variant-numeric:tabular-nums}
+  .qprog{color:var(--ink2);font-variant-numeric:tabular-nums;opacity:.8}
+  .qscore{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .qscore b{color:var(--red);font-size:17px}
+  .qcombo{color:var(--gold);opacity:0;transition:opacity .2s;font-size:11px}
+  .qcombo.on{opacity:1}
+  .qbar{height:5px;border-radius:3px;background:#e3d6c2;overflow:hidden;margin-bottom:13px}
+  .qbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--jade),var(--gold));transition:width .1s linear}
+  .qcard{background:var(--paper2);border:1px solid var(--line);border-radius:14px;padding:16px 15px}
+  .qq{font-size:17px;line-height:1.6;letter-spacing:.4px;min-height:54px}
+  .qopts{display:grid;gap:7px;margin-top:13px}
+  .qopt{display:flex;align-items:center;gap:10px;text-align:left;background:#fff;border:1px solid var(--line);
+    border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14.5px;color:inherit;cursor:pointer;transition:.1s}
+  .qopt:hover{border-color:var(--gold)}
+  .qopt .k{width:20px;height:20px;border-radius:5px;background:#efe5d5;color:var(--ink2);font-size:11px;display:grid;place-items:center;flex:0 0 auto}
+  .qopt.ok{border-color:var(--jade);background:#eaf3ee}
+  .qopt.ok .k{background:var(--jade);color:#fff}
+  .qopt.bad{border-color:var(--red);background:#f8e9e6}
+  .qopt.bad .k{background:var(--red);color:#fff}
+  .qopt[disabled]{cursor:default}
+  .qfb{margin-top:11px;font-size:12.5px;line-height:1.65;color:var(--ink2);min-height:18px}
+  .qfb b{color:var(--ink)}
+  .qsrc{font-size:10.5px;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0 6px;margin-left:4px;white-space:nowrap}
+  .qnext{width:100%;margin-top:11px;padding:10px;border-radius:10px;border:none;background:var(--ink);
+    color:#f7efe3;font-family:inherit;font-size:14px;letter-spacing:2px;cursor:pointer}
+  .qnext:disabled{background:#eadfcd;color:#b6a48d;cursor:default}
+  .qghost{width:100%;margin-top:8px;padding:10px;border-radius:10px;border:1px solid var(--line);
+    background:none;color:var(--ink2);font-family:inherit;font-size:13px;cursor:pointer}
+  .tlbig{background:#fff;border:1px solid var(--line);border-left:4px solid var(--red);border-radius:9px;
+    padding:11px;text-align:center;font-size:16px;margin:9px 0}
+  .tlrow{display:flex;flex-direction:column}
+  .tlslot{height:21px;margin:3px 0;border:1px dashed var(--line);border-radius:6px;background:#fbf6ee;
+    color:#b9a68d;font-size:10.5px;font-family:inherit;cursor:pointer;letter-spacing:2px}
+  .tlslot:hover{border-color:var(--gold);color:var(--gold)}
+  .tlitem{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid var(--line);
+    border-radius:7px;padding:6px 10px;font-size:12.5px}
+  .tlitem .yy{color:var(--gold);font-size:11px;min-width:32px;font-variant-numeric:tabular-nums}
+  .achips{display:flex;flex-wrap:wrap;gap:5px;min-height:30px;margin-bottom:8px}
+  .achip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12.5px}
+  .ainput{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+    font-family:inherit;font-size:15px;background:#fff;color:var(--ink);outline:none}
+  .ainput:focus{border-color:var(--gold)}
+  .areveal{margin-top:10px;display:grid;gap:4px}
+  .areveal .rv{font-size:12.5px;color:var(--ink2);display:flex;gap:7px;align-items:center}
+  .areveal .rv .d{width:6px;height:6px;border-radius:50%;background:var(--line);flex:0 0 auto}
+  .areveal .rv.hit{color:var(--jade)}
+  .areveal .rv.hit .d{background:var(--jade)}
+  .rlabel{font-size:10.5px;letter-spacing:2px;color:var(--gold);margin-bottom:6px}
+  .restitle{font-size:12px;letter-spacing:2px;color:var(--ink2)}
+  .resscore{font-size:48px;line-height:1;color:var(--red);margin:6px 0 4px}
+  .resstats{display:flex;gap:16px;font-size:12.5px;color:var(--ink2);flex-wrap:wrap}
+  .resreview{margin-top:14px;max-height:36vh;overflow:auto}
+  .ritem{border-top:1px dashed var(--line);padding:8px 0;font-size:12.5px;line-height:1.6}
+  .rq{font-weight:600}
+  .ra{color:var(--jade)}
+  .rn{color:var(--ink2);font-size:11.5px}
+  @media (max-width:560px){ .playbtn{padding:6px 10px} .sheet-in{margin:8px auto;padding:12px 13px 16px} }
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} .modal{animation:none} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hbar">
+    <div class="seal">唐</div>
+    <div class="ttl">唐朝 289 年<small>618 — 907 · 八条主线</small></div>
+    <div class="dots" id="dots"></div>
+    <div class="nav">
+      <button id="prev" title="上一章">‹</button>
+      <button id="next" title="下一章">›</button>
+    </div>
+    <button class="playbtn" id="playBtn">闯关</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="succ">
+    <div class="sechead">
+      <h2>皇位更替</h2>
+      <span class="hint">点任意一位，跳到对应章节</span>
+    </div>
+    <div class="secstat" id="rstat"></div>
+    <div class="tlwrap" id="tlwrap"></div>
+    <div class="tlegend">
+      <span><i style="background:#f0f6f2;border-color:#8cb3a3"></i>治世</span>
+      <span><i style="background:#faf5ec"></i>平稳</span>
+      <span><i style="background:#fbf0ed;border-color:#cb9086"></i>乱局</span>
+      <span><span class="pt"></span>非正常继位</span>
+    </div>
+    <button class="jump" id="jump">↓ 跳到八章主线</button>
+  </section>
+
+  <main id="chapters">
+    <div class="intro">
+      <p>上面竖着的是 <b>23 次即位</b>：在位年份、庙号、姓名、别称，以及最多三条治世评价或大事；下面是 <b>八章主线</b>，每章末尾有一条因果链。</p>
+      <p>点轴上的皇帝跳到对应章节，点任意卡片看细节和同期的其他人，按 <kbd>←</kbd> <kbd>→</kbd> 翻章。</p>
+    </div>
+    <div class="filters" id="filters">
+      <button class="fchip on" data-f="">全部</button>
+      <button class="fchip" data-f="emp">皇位</button>
+      <button class="fchip" data-f="pow">权力</button>
+      <button class="fchip" data-f="war">战争</button>
+      <button class="fchip" data-f="ppl">人物</button>
+      <button class="fchip" data-f="cul">文化</button>
+      <button class="fchip" data-f="rel">文物</button>
+    </div>
+  </main>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="sheet-in">
+    <div class="sheet-top">
+      <span class="sheet-title" id="vTitle">闯关</span>
+      <button class="sheet-close" id="sheetClose">×</button>
+    </div>
+
+    <div class="view on" id="v-menu">
+      <p class="vsub">读完一段就来验一下。答错会立刻给正解、一句解释和出处；错题在结果页汇总。</p>
+      <div class="gcards">
+        <button class="gcard" data-g="quiz"><span class="gi">问</span><span><span class="gt">快问快答</span><span class="gd"><span id="bankSize">…</span> 题随机 · 60 秒 · 连击加分</span></span></button>
+        <button class="gcard" data-g="tl"><span class="gi">序</span><span><span class="gt">时间轴插卡</span><span class="gd">19 个事件 · 3 条命 · 插错掉命</span></span></button>
+        <button class="gcard" data-g="as"><span class="gi">联</span><span><span class="gt">联想发散</span><span class="gd">9 个类目 · 45 秒 · 同类检索</span></span></button>
+      </div>
+    </div>
+
+    <div class="view" id="v-quiz">
+      <div class="qmeta">
+        <span id="qLabel"></span>
+        <span class="qtime" id="qTime">60s</span>
+        <span class="qprog" id="qProg">1 / 10</span>
+        <span class="qscore">得分 <b id="qScore">0</b><span class="qcombo" id="qCombo">连击 ×2</span></span>
+      </div>
+      <div class="qbar" id="qBar"><i style="width:100%"></i></div>
+      <div class="qcard">
+        <div class="qq" id="qText"></div>
+        <div class="qopts" id="qOpts"></div>
+        <div class="qfb" id="qFb"></div>
+        <button class="qnext" id="qNext" disabled>下一题</button>
+      </div>
+    </div>
+
+    <div class="view" id="v-tl">
+      <div class="qmeta"><span>把这张卡插进正确的时间位置</span><span class="qtime" id="tlLives">❤❤❤</span></div>
+      <div class="tlbig" id="tlCard"></div>
+      <div class="tlrow" id="tlRow"></div>
+      <div class="qfb" id="tlFb"></div>
+    </div>
+
+    <div class="view" id="v-as">
+      <div class="qmeta"><span id="asCat"></span><span class="qtime" id="asTime">45s</span></div>
+      <div class="qbar"><i id="asBar" style="width:100%"></i></div>
+      <div class="achips" id="asChips"></div>
+      <input class="ainput" id="asInput" placeholder="输入一个答案，回车添加…" autocomplete="off">
+      <div class="qfb" id="asFb"></div>
+      <div class="areveal" id="asReveal"></div>
+      <button class="qnext" id="asDone" style="display:none">看结果</button>
+    </div>
+
+    <div class="view" id="v-res">
+      <div class="restitle" id="resTitle"></div>
+      <div class="resscore" id="resScore">0</div>
+      <div class="resstats" id="resStats"></div>
+      <div class="resreview" id="resReview"></div>
+      <button class="qnext" id="resAgain">再来一局</button>
+      <button class="qghost" id="resHome">回主线</button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose">×</button>
+  <img id="lbImg" alt="">
+  <div class="lb-cap"><span id="lbCap"></span><a id="lbSrc" target="_blank" rel="noopener">Wikimedia Commons ↗</a></div>
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal" id="modal">
+    <div class="mhead">
+      <h3 id="mTitle">—</h3>
+      <button class="mclose" id="mClose">×</button>
+    </div>
+    <div class="mmeta" id="mMeta"></div>
+    <div class="mbody" id="mBody"></div>
+    <div class="mrel" id="mRel"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   数据
+   ============================================================ */
+
+
+/* ---------- 闯关题库（由 tang-quiz 迁入） ---------- */
+const QB = [
+  {y:618, q:"唐朝建立于哪一年？", o:["617 年","618 年","620 年"], a:1, n:"李渊在长安称帝，国号唐，改元武德。", s:"《旧唐书·高祖本纪》"},
+  {y:626, q:"玄武门之变发生在哪一年？", o:["626 年","618 年","690 年"], a:0, n:"李世民在玄武门杀李建成、李元吉，随后被立为太子，同年即位。", s:"《资治通鉴》"},
+  {y:627, q:"唐太宗的年号是？", o:["开元","贞观","永徽"], a:1, n:"627 年改元贞观，贞观之治即指这一时期。", s:"《旧唐书·太宗本纪》"},
+  {y:618, q:"三省六部制中，负责审议、封驳诏令的是？", o:["中书省","门下省","尚书省"], a:1, n:"中书出令、门下审议、尚书执行，三者分工制衡。", s:"《唐六典》"},
+  {y:618, q:"唐代科举中地位最高、最难考的科目是？", o:["明经科","进士科","制科"], a:1, n:"进士科录取极少，有“三十老明经，五十少进士”之说。", s:"《通典·选举典》"},
+  {y:755, q:"安史之乱爆发于哪一年？", o:["745 年","755 年","763 年"], a:1, n:"安禄山在范阳起兵，次年攻入洛阳、长安。", s:"《资治通鉴》"},
+  {y:755, q:"安史之乱前后持续了约多少年？", o:["4 年","8 年","15 年"], a:1, n:"755 年爆发，763 年史朝义自杀，乱事平定。", s:"《旧唐书·玄宗本纪》"},
+  {y:780, q:"提出并推行两税法的是？", o:["杨炎","刘晏","宇文融"], a:0, n:"780 年推行，按资产与田亩征税，改变以人丁为本的旧制。", s:"《旧唐书·杨炎传》"},
+  {y:907, q:"唐朝灭亡于哪一年？", o:["875 年","907 年","960 年"], a:1, n:"朱温废哀帝，唐亡；同年建后梁，五代开始。", s:"《旧唐书·哀帝本纪》"},
+  {y:907, q:"取代唐朝、建立后梁的是？", o:["朱温","李克用","黄巢"], a:0, n:"朱温原为黄巢部将，降唐后势力坐大，最终篡唐。", s:"《旧五代史》"},
+  {y:690, q:"中国历史上唯一被普遍承认的女皇帝是？", o:["吕后","武则天","慈禧"], a:1, n:"690 年称帝，改国号为周，705 年神龙政变后退位。", s:"《旧唐书·则天皇后本纪》"},
+  {y:690, q:"武则天称帝后，改国号为？", o:["周","汉","魏"], a:0, n:"史称“武周”，但她仍被视为唐朝帝系的一部分。", s:"《新唐书·则天皇后本纪》"},
+  {y:713, q:"唐玄宗前期的年号是？", o:["开元","天宝","贞观"], a:0, n:"713 年改元开元；后期改元天宝，由盛转衰。", s:"《旧唐书·玄宗本纪》"},
+  {y:756, q:"唐玄宗之后即位的皇帝是？", o:["唐高宗","唐肃宗","唐代宗"], a:1, n:"安史之乱中玄宗入蜀，肃宗在灵武即位。", s:"《旧唐书·肃宗本纪》"},
+  {y:653, q:"《唐律疏议》颁行于哪位皇帝时期？", o:["唐太宗","唐高宗","唐玄宗"], a:1, n:"永徽年间编成，是中国现存最早、最完整的封建法典。", s:"《旧唐书·刑法志》"},
+  {y:641, q:"文成公主入藏，嫁给了谁？", o:["松赞干布","尺带珠丹","噶尔·东赞"], a:0, n:"641 年入吐蕃，唐蕃通婚自此开始。", s:"《旧唐书·吐蕃传》"},
+  {y:645, q:"玄奘西行求法回国后，主要在长安哪座寺院译经？", o:["白马寺","大慈恩寺","少林寺"], a:1, n:"大慈恩寺即今西安大雁塔所在；《大唐西域记》由他口述。", s:"《大慈恩寺三藏法师传》"},
+  {y:690, q:"禅宗六祖是？", o:["神秀","慧能","道宣"], a:1, n:"“菩提本无树”一偈，标志禅宗南宗的顿悟法门。", s:"《坛经》"},
+  {y:753, q:"鉴真六次东渡，最终到达？", o:["新罗","日本","天竺"], a:1, n:"753 年抵达日本，在奈良建唐招提寺。", s:"《唐大和上东征传》"},
+  {y:751, q:"751 年，唐军与大食交战于？", o:["怛罗斯","高昌","碎叶"], a:0, n:"唐军失利，造纸术西传之说常系于此役。", s:"《旧唐书·西戎传》"},
+  {y:742, q:"被称为“诗仙”的唐代诗人是？", o:["杜甫","李白","白居易"], a:1, n:"李白诗风豪放飘逸；杜甫为“诗圣”。", s:"《新唐书·文艺传》"},
+  {y:755, q:"被称为“诗圣”的唐代诗人是？", o:["杜甫","王维","李贺"], a:0, n:"杜甫诗被称为“诗史”，记录安史之乱前后的社会。", s:"《新唐书·文艺传》"},
+  {y:806, q:"《长恨歌》的作者是？", o:["白居易","元稹","李商隐"], a:0, n:"以唐玄宗与杨贵妃故事为题材的长篇叙事诗。", s:"《白氏长庆集》"},
+  {y:815, q:"倡导“古文运动”的唐代文学家是？", o:["韩愈","刘禹锡","温庭筠"], a:0, n:"反对骈文、提倡先秦两汉散体，与柳宗元并称“韩柳”。", s:"《旧唐书·韩愈传》"},
+  {y:720, q:"被后世尊为“画圣”的唐代画家是？", o:["阎立本","吴道子","周昉"], a:1, n:"吴道子擅佛道人物，有“吴带当风”之誉。", s:"《历代名画记》"},
+  {y:755, q:"“颜筋柳骨”中的“颜”指？", o:["颜真卿","颜之推","颜师古"], a:0, n:"颜真卿楷书雄浑，柳公权骨力劲健。", s:"《新唐书·颜真卿传》"},
+  {y:780, q:"《茶经》的作者是？", o:["陆羽","卢仝","皎然"], a:0, n:"中国第一部茶学专著，陆羽被后世称为“茶圣”。", s:"《新唐书·隐逸传》"},
+  {y:728, q:"唐代主持天文测量、算出子午线一度的僧人是？", o:["一行","善导","不空"], a:0, n:"一行与南宫说等实测，编《大衍历》。", s:"《旧唐书·方伎传》"},
+  {y:757, q:"安史之乱中死守睢阳的是？", o:["张巡","李光弼","哥舒翰"], a:0, n:"张巡、许远守睢阳阻叛军南下，城破殉难。", s:"《旧唐书·张巡传》"},
+  {y:755, q:"安史之乱的发动者是？", o:["安禄山","史朝义","朱泚"], a:0, n:"安禄山以范阳、平卢、河东三镇起兵，史思明继之。", s:"《旧唐书·安禄山传》"},
+  {y:763, q:"安史之乱平定后，唐朝中央与地方的主要矛盾是？", o:["藩镇割据","外戚专权","南北朝的遗留"], a:0, n:"河朔三镇（成德、魏博、卢龙）名义归附、实则自立。", s:"《新唐书·藩镇传》"},
+  {y:784, q:"唐后期宦官掌握的精锐禁军是？", o:["神策军","府兵","金吾卫"], a:0, n:"宦官掌神策军后，废立皇帝皆由其操纵。", s:"《旧唐书·宦官传》"},
+  {y:821, q:"“牛李党争”主要发生在哪段时期？", o:["唐太宗至高宗","唐穆宗至唐宣宗","唐僖宗至昭宗"], a:1, n:"以牛僧孺、李德裕为首的两派争斗近四十年。", s:"《新唐书·牛僧孺传》"},
+  {y:835, q:"甘露之变发生在哪一年？", o:["835 年","755 年","875 年"], a:0, n:"唐文宗谋诛宦官失败，反遭挟持，此后宦官气焰更盛。", s:"《资治通鉴》"},
+  {y:845, q:"会昌灭佛发生在哪位皇帝在位时？", o:["唐武宗","唐宣宗","唐懿宗"], a:0, n:"845 年下令拆寺汰僧，是“三武一宗”法难之一。", s:"《旧唐书·武宗本纪》"},
+  {y:875, q:"黄巢起义爆发于哪一年？", o:["835 年","875 年","907 年"], a:1, n:"王仙芝、黄巢起兵，881 年攻入长安。", s:"《旧唐书·黄巢传》"},
+  {y:618, q:"唐朝的都城长安，是今天的？", o:["洛阳","西安","开封"], a:1, n:"唐长安城在汉长安城东南，今西安市区。", s:"《唐两京城坊考》"},
+  {y:618, q:"唐朝前期的兵役制度是？", o:["府兵制","募兵制","卫所制"], a:0, n:"府兵自备资粮、定期宿卫；均田制破坏后难以为继。", s:"《新唐书·兵志》"},
+  {y:624, q:"唐初的赋税制度是？", o:["租庸调","两税法","一条鞭法"], a:0, n:"以人丁为本，租、庸、调三项；780 年被两税法取代。", s:"《旧唐书·食货志》"},
+  {y:714, q:"唐代在广州设管理对外贸易的官职是？", o:["市舶使","转运使","盐铁使"], a:0, n:"唐玄宗时设市舶使，掌海上贸易征税。", s:"《旧唐书·职官志》"},
+  {y:821, q:"唐朝与吐蕃在 821 年会盟，史称？", o:["长庆会盟","澶渊之盟","清水之盟"], a:0, n:"会盟碑今存拉萨大昭寺前。", s:"《旧唐书·吐蕃传》"},
+  {y:627, q:"“贞观之治”指的是哪位皇帝在位期间？", o:["唐高祖","唐太宗","唐玄宗"], a:1, n:"627—649 年，政治清明、国力恢复。", s:"《旧唐书·太宗本纪》"},
+
+  /* 谁更早 */
+  {y:626, q:"玄武门之变与贞观改元，哪个在前？", o:["玄武门之变","贞观之治开始"], a:0, n:"玄武门之变在 626 年，次年才改元贞观。", s:"《资治通鉴》"},
+  {y:755, q:"安史之乱与两税法推行，哪个在前？", o:["安史之乱爆发","两税法推行"], a:0, n:"755 年 vs 780 年，中间隔了二十多年。", s:"《旧唐书·食货志》"},
+  {y:835, q:"甘露之变与黄巢起义，哪个在前？", o:["甘露之变","黄巢起义"], a:0, n:"835 年 vs 875 年，后者已是唐末。", s:"《资治通鉴》"},
+  {y:641, q:"文成公主入藏与玄奘回到长安，哪个在前？", o:["文成公主入藏","玄奘回到长安"], a:0, n:"641 年 vs 645 年。", s:"《旧唐书·吐蕃传》"},
+  {y:690, q:"武则天称帝与神龙政变，哪个在前？", o:["武则天称帝","神龙政变"], a:0, n:"690 年称帝，705 年被逼退位。", s:"《旧唐书·则天皇后本纪》"},
+  {y:751, q:"怛罗斯之战与安史之乱，哪个在前？", o:["怛罗斯之战","安史之乱爆发"], a:0, n:"751 年 vs 755 年，只差四年。", s:"《旧唐书·西戎传》"}
+,
+  {y:618, q:"唐朝的开国皇帝是？", o:["李渊","李世民","李建成"], a:0, n:"李渊在长安称帝，改元武德。", s:"《旧唐书·高祖本纪》"},
+  {y:626, q:"玄武门之变中被杀的太子是？", o:["李建成","李元吉","李承乾"], a:0, n:"李建成是李渊长子，与齐王李元吉一同被杀。", s:"《资治通鉴》"},
+  {y:618, q:"唐朝建立时的都城是？", o:["长安","洛阳","太原"], a:0, n:"定都长安，以洛阳为东都则是后来才确立的。", s:"《旧唐书·地理志》"},
+  {y:618, q:"三省六部中负责执行政令的是？", o:["尚书省","中书省","门下省"], a:0, n:"中书出令、门下审议、尚书执行。", s:"《唐六典》"},
+  {y:618, q:"唐高祖的年号是？", o:["武德","贞观","开元"], a:0, n:"武德共九年（618—626）。", s:"《旧唐书·高祖本纪》"},
+  {y:617, q:"李渊起兵的地点是？", o:["太原","洛阳","江都"], a:0, n:"晋阳即今太原，故称晋阳起兵。", s:"《旧唐书·高祖本纪》"},
+  {y:621, q:"李世民在统一战争中一战擒获的两位对手是？", o:["王世充与窦建德","刘武周与薛举","萧铣与辅公祏"], a:0, n:"621 年虎牢之战，先破窦建德，王世充随即出降。", s:"《资治通鉴》"},
+  {y:630, q:"贞观年间以直谏著称的大臣是？", o:["魏征","房玄龄","李靖"], a:0, n:"魏征前后进谏两百余事，是贞观纳谏的象征。", s:"《旧唐书·魏征传》"},
+  {y:630, q:"630 年被唐军灭亡的草原政权是？", o:["东突厥","西突厥","吐谷浑"], a:0, n:"李靖夜袭阴山，颉利可汗被俘，东突厥亡。", s:"《旧唐书·突厥传》"},
+  {y:630, q:"被西北诸部尊为“天可汗”的是？", o:["唐太宗","唐高祖","唐高宗"], a:0, n:"这既是尊号，也意味着对草原诸部的册封与调兵权。", s:"《旧唐书·太宗本纪》"},
+  {y:641, q:"641 年入吐蕃和亲的是？", o:["文成公主","金城公主","太平公主"], a:0, n:"文成公主嫁松赞干布；金城公主是玄宗朝的事。", s:"《旧唐书·吐蕃传》"},
+  {y:638, q:"太宗重修《氏族志》的主要目的是？", o:["抬高皇族、压制山东旧姓","恢复九品中正制","统计全国户口"], a:0, n:"把皇族列为第一等，刻意压低崔、卢等旧姓。", s:"《旧唐书·高士廉传》"},
+  {y:629, q:"玄奘西行出发时在位的皇帝是？", o:["唐太宗","唐高宗","武则天"], a:0, n:"贞观年间出发，贞观十九年（645）回到长安。", s:"《大慈恩寺三藏法师传》"},
+  {y:627, q:"中书省的长官称？", o:["中书令","侍中","尚书令"], a:0, n:"门下省长官为侍中，尚书省长官为尚书令。", s:"《唐六典》"},
+  {y:629, q:"“房谋杜断”中的“房”指？", o:["房玄龄","房琯","房遗爱"], a:0, n:"房玄龄善谋，杜如晦善断。", s:"《旧唐书·房玄龄传》"},
+  {y:649, q:"贞观之治结束于哪一年？", o:["649 年","626 年","683 年"], a:0, n:"太宗崩于贞观二十三年（649）。", s:"《旧唐书·太宗本纪》"},
+  {y:686, q:"武则天设置、用于接受告密的器物是？", o:["铜匦","铜镜","铜鱼符"], a:0, n:"垂拱二年（686）置铜匦于朝堂，四色分投。", s:"《旧唐书·则天皇后本纪》"},
+  {y:657, q:"657 年灭西突厥的唐将是？", o:["苏定方","薛仁贵","程知节"], a:0, n:"唐军推进到中亚，设昆陵、濛池都护府。", s:"《旧唐书·苏定方传》"},
+  {y:663, q:"白江口之战中唐军的对手是？", o:["日本与百济","吐蕃","高句丽"], a:0, n:"唐军以少胜多，此后日本转向学习唐制。", s:"《旧唐书·东夷传》"},
+  {y:660, q:"灭百济的唐军主将是？", o:["苏定方","刘仁轨","李勣"], a:0, n:"刘仁轨随后在白江口指挥唐军。", s:"《旧唐书·苏定方传》"},
+  {y:705, q:"结束武周、恢复唐朝国号的政变是？", o:["神龙政变","唐隆政变","先天政变"], a:0, n:"张柬之等逼武则天退位，中宗复位。", s:"《资治通鉴》"},
+  {y:690, q:"武则天首创的科举环节是？", o:["殿试","糊名","弥封"], a:0, n:"她曾亲策贡士于洛城殿，被视为殿试之始。", s:"《通典·选举典》"},
+  {y:690, q:"武则天朝著名的酷吏是？", o:["来俊臣","李林甫","鱼朝恩"], a:0, n:"来俊臣与周兴掌诏狱，编《罗织经》。", s:"《旧唐书·酷吏传》"},
+  {y:653, q:"《唐律疏议》的体例是？", o:["律文加疏议","判例汇编","皇帝诏令汇编"], a:0, n:"律文之后逐条疏解，形成完整的法典结构。", s:"《旧唐书·刑法志》"},
+  {y:652, q:"玄奘回国后创立的宗派是？", o:["法相宗","禅宗","华严宗"], a:0, n:"因主张“万法唯识”，又称唯识宗。", s:"《大慈恩寺三藏法师传》"},
+  {y:683, q:"唐高宗去世后即位的皇帝是？", o:["唐中宗","唐睿宗","唐玄宗"], a:0, n:"中宗李显即位两月即被武则天废为庐陵王。", s:"《旧唐书·中宗本纪》"},
+  {y:710, q:"唐隆政变的发动者是？", o:["李隆基","李显","李旦"], a:0, n:"李隆基联合太平公主杀韦后，拥睿宗复位。", s:"《资治通鉴》"},
+  {y:713, q:"先天政变中被赐死的公主是？", o:["太平公主","安乐公主","文成公主"], a:0, n:"太平公主与玄宗争权失败，被赐死家中。", s:"《旧唐书·太平公主传》"},
+  {y:713, q:"开元前期以“十事要说”拜相的是？", o:["姚崇","宋璟","张说"], a:0, n:"姚崇提出十条施政纲领作为拜相条件。", s:"《旧唐书·姚崇传》"},
+  {y:713, q:"开元前期与姚崇并称的名相是？", o:["宋璟","张九龄","李林甫"], a:0, n:"姚崇善应变，宋璟善守文，并称“姚宋”。", s:"《新唐书·宋璟传》"},
+  {y:722, q:"张说建议招募壮士充宿卫，标志哪一制度开始瓦解？", o:["府兵制","募兵制","卫所制"], a:0, n:"兵源从自备资粮的自耕农变为领饷的职业兵。", s:"《新唐书·兵志》"},
+  {y:728, q:"主持编修《大衍历》的是？", o:["一行","玄奘","僧肇"], a:0, n:"一行还主持了全国范围的天文测量。", s:"《旧唐书·方伎传》"},
+  {y:733, q:"开元后期被罢相的名相是？", o:["张九龄","姚崇","宋璟"], a:0, n:"他反对重用李林甫、反对纵容安禄山，意见未被采纳。", s:"《旧唐书·张九龄传》"},
+  {y:721, q:"被称为“诗佛”的唐代诗人是？", o:["王维","李白","孟浩然"], a:0, n:"王维晚年好佛，诗中有画。", s:"《新唐书·文艺传》"},
+  {y:750, q:"传为周昉所绘、现藏辽宁省博物馆的唐画是？", o:["簪花仕女图","步辇图","五牛图"], a:0, n:"描绘贵族妇女簪花游园，是唐代服饰妆饰的关键图像。", s:"辽宁省博物馆藏品"},
+  {y:741, q:"开元这一年号共用了多少年？", o:["29 年","15 年","40 年"], a:0, n:"713—741 年，共 29 年。", s:"《旧唐书·玄宗本纪》"},
+  {y:742, q:"唐玄宗改元天宝是在哪一年？", o:["742 年","713 年","755 年"], a:0, n:"开元三十年改元天宝，此后玄宗逐渐怠于政事。", s:"《旧唐书·玄宗本纪》"},
+  {y:751, q:"怛罗斯之战的对手是？", o:["大食","吐蕃","回纥"], a:0, n:"高仙芝率唐军与大食交战，因葛逻禄部倒戈而败。", s:"《旧唐书·西戎传》"},
+  {y:751, q:"怛罗斯之战中唐军主将是？", o:["高仙芝","哥舒翰","封常清"], a:0, n:"高仙芝时任安西节度使。", s:"《旧唐书·高仙芝传》"},
+  {y:756, q:"马嵬驿之变中被迫自尽的是？", o:["杨贵妃","杨国忠","高力士"], a:0, n:"杨国忠被乱兵所杀，杨贵妃被缢死。", s:"《旧唐书·杨贵妃传》"},
+  {y:756, q:"灵武即位的皇帝是？", o:["唐肃宗","唐代宗","唐德宗"], a:0, n:"李亨在灵武自行即位，尊玄宗为太上皇。", s:"《旧唐书·肃宗本纪》"},
+  {y:757, q:"收复两京的唐军主将是？", o:["郭子仪","李光弼","仆固怀恩"], a:0, n:"借回纥兵反攻，先后收复长安、洛阳。", s:"《旧唐书·郭子仪传》"},
+  {y:753, q:"鉴真第六次东渡到达日本是在？", o:["753 年","741 年","763 年"], a:0, n:"他在奈良建唐招提寺，次年去世。", s:"《唐大和上东征传》"},
+  {y:755, q:"安禄山起兵时兼任的节度使不包括？", o:["安西","范阳","平卢"], a:0, n:"安禄山兼范阳、平卢、河东三镇，安西不在其手。", s:"《旧唐书·安禄山传》"},
+  {y:759, q:"被称为“诗史”的唐代诗人是？", o:["杜甫","李白","白居易"], a:0, n:"杜甫的诗记录安史之乱前后的社会，故称诗史。", s:"《新唐书·文艺传》"},
+  {y:780, q:"两税法的主要提出者是？", o:["杨炎","刘晏","杜佑"], a:0, n:"780 年推行，按资产与田亩征税。", s:"《旧唐书·杨炎传》"},
+  {y:780, q:"两税法的征税依据是？", o:["资产与田亩","人丁","爵位"], a:0, n:"征税对象由人丁转向财产，是赋税史的分水岭。", s:"《旧唐书·食货志》"},
+  {y:763, q:"“河朔三镇”指？", o:["成德、魏博、卢龙","安西、北庭、河西","朔方、河东、范阳"], a:0, n:"三镇名义归附，实则父子相承、赋税自专。", s:"《新唐书·藩镇传》"},
+  {y:783, q:"泾原兵变中出逃的皇帝是？", o:["唐德宗","唐顺宗","唐宪宗"], a:0, n:"泾原兵途经长安哗变，德宗逃往奉天。", s:"《旧唐书·德宗本纪》"},
+  {y:784, q:"宦官掌握神策军始于哪位皇帝？", o:["唐德宗","唐玄宗","唐宪宗"], a:0, n:"泾原兵变后德宗不再信任武将，以宦官领禁军。", s:"《旧唐书·宦官传》"},
+  {y:801, q:"《通典》的作者是？", o:["杜佑","刘知几","郑樵"], a:0, n:"中国第一部典章制度通史。", s:"《旧唐书·杜佑传》"},
+  {y:790, q:"韩愈倡导的文学运动是？", o:["古文运动","新乐府运动","骈文复兴"], a:0, n:"反对骈文，提倡先秦两汉散体。", s:"《旧唐书·韩愈传》"},
+  {y:763, q:"763 年攻入长安的政权是？", o:["吐蕃","回纥","南诏"], a:0, n:"吐蕃趁唐朝虚弱攻入长安，代宗出逃。", s:"《旧唐书·吐蕃传》"},
+  {y:805, q:"在位仅八个月即禅位的皇帝是？", o:["唐顺宗","唐德宗","唐宪宗"], a:0, n:"顺宗在位八月，永贞革新失败后禅位于宪宗。", s:"《旧唐书·顺宗本纪》"},
+  {y:805, q:"永贞革新的主导者是？", o:["王叔文","李德裕","牛僧孺"], a:0, n:"王叔文、王伾推行改革，百余日而败。", s:"《旧唐书·王叔文传》"},
+  {y:817, q:"雪夜袭蔡州、生擒吴元济的将领是？", o:["李愬","李光弼","李晟"], a:0, n:"此战是元和中兴的顶点。", s:"《旧唐书·李愬传》"},
+  {y:817, q:"元和中兴的皇帝是？", o:["唐宪宗","唐德宗","唐宣宗"], a:0, n:"宪宗削平淮西、淄青，藩镇短暂归附。", s:"《旧唐书·宪宗本纪》"},
+  {y:835, q:"甘露之变发生在哪位皇帝在位时？", o:["唐文宗","唐武宗","唐宣宗"], a:0, n:"文宗谋诛宦官失败，此后“天下事皆决于北司”。", s:"《资治通鉴》"},
+  {y:821, q:"牛李党争中“李党”的领袖是？", o:["李德裕","李宗闵","李吉甫"], a:0, n:"两派争斗近四十年，贯穿六朝。", s:"《新唐书·李德裕传》"},
+  {y:820, q:"唐宪宗的死因是？", o:["被宦官所弑","战乱","疾病"], a:0, n:"宦官陈弘志等弑君而不受追究。", s:"《旧唐书·宪宗本纪》"},
+  {y:815, q:"韩愈古文运动的核心主张是？", o:["文以载道","诗缘情","独抒性灵"], a:0, n:"文章应当承载儒家的道，而非堆砌辞藻。", s:"《旧唐书·韩愈传》"},
+  {y:805, q:"“二王八司马”指的是？", o:["永贞革新失败后被贬的官员","甘露之变中被杀的朝臣","牛李党争中的两派"], a:0, n:"改革失败后，参与者十人被贬为远州司马。", s:"《旧唐书·王叔文传》"},
+  {y:845, q:"会昌灭佛发生在哪位皇帝时？", o:["唐武宗","唐宣宗","唐懿宗"], a:0, n:"拆寺四千六百余所，勒令僧尼还俗二十六万余人。", s:"《旧唐书·武宗本纪》"},
+  {y:846, q:"“大中之治”的皇帝是？", o:["唐宣宗","唐武宗","唐懿宗"], a:0, n:"宣宗抑制宦官、整顿吏治，人称“小太宗”。", s:"《资治通鉴》"},
+  {y:848, q:"收复河西十一州的是？", o:["张议潮","张淮深","李晟"], a:0, n:"848 年沙州起兵，归附唐朝。", s:"《旧唐书·宣宗本纪》"},
+  {y:875, q:"黄巢起义爆发于？", o:["875 年","835 年","907 年"], a:0, n:"黄巢响应王仙芝起兵，转战南北。", s:"《旧唐书·黄巢传》"},
+  {y:881, q:"黄巢攻入长安后建立的国号是？", o:["大齐","大燕","大梁"], a:0, n:"881 年黄巢称帝，国号大齐。", s:"《旧唐书·黄巢传》"},
+  {y:907, q:"朱温建立的朝代是？", o:["后梁","后唐","后晋"], a:0, n:"907 年废哀帝自立，国号梁，史称后梁。", s:"《旧五代史》"},
+  {y:905, q:"白马之祸中朱温杀害的是？", o:["朝臣","宦官","宗室"], a:0, n:"杀宰相裴枢等三十余人于白马驿，投尸黄河。", s:"《旧唐书·哀帝本纪》"},
+  {y:868, q:"庞勋起义的起因是？", o:["戍卒久戍不归","盐税过重","藩镇争立"], a:0, n:"桂州戍卒因久戍不得替换而哗变，北上攻掠。", s:"《资治通鉴》"},
+  {y:873, q:"唐懿宗迎奉的佛骨来自？", o:["法门寺","少林寺","白马寺"], a:0, n:"咸通十四年迎法门寺佛骨入长安，次年懿宗去世。", s:"《旧唐书·懿宗本纪》"}
+];
+
+const EVENTS = [
+  {y:618, t:"李渊称帝，唐朝建立"},
+  {y:626, t:"玄武门之变"},
+  {y:627, t:"改元贞观"},
+  {y:641, t:"文成公主入藏"},
+  {y:645, t:"玄奘回到长安"},
+  {y:653, t:"颁行《唐律疏议》"},
+  {y:690, t:"武则天称帝，改国号为周"},
+  {y:705, t:"神龙政变，武则天退位"},
+  {y:713, t:"改元开元"},
+  {y:751, t:"怛罗斯之战"},
+  {y:755, t:"安史之乱爆发"},
+  {y:763, t:"安史之乱平定"},
+  {y:780, t:"推行两税法"},
+  {y:821, t:"唐蕃长庆会盟"},
+  {y:835, t:"甘露之变"},
+  {y:845, t:"会昌灭佛"},
+  {y:875, t:"黄巢起义爆发"},
+  {y:881, t:"黄巢攻入长安"},
+  {y:907, t:"朱温灭唐，建立后梁"}
+];
+
+const CATS = [
+  {c:"唐代著名诗人（写出 6 位以上）", a:["李白","杜甫","白居易","王维","李商隐","杜牧","韩愈","柳宗元","孟浩然","王昌龄","岑参","高适","刘禹锡","元稹","李贺","温庭筠","王之涣","崔颢"]},
+  {c:"安史之乱中的关键人物（写出 5 位以上）", a:["安禄山","史思明","郭子仪","李光弼","哥舒翰","封常清","高仙芝","张巡","许远","颜杲卿","安庆绪","史朝义"]},
+  {c:"唐朝皇帝（写出 6 位以上）", a:["李渊","李世民","李治","武则天","李显","李旦","李隆基","李亨","李豫","李适","李纯","李昂","李炎","李忱","李儇","李晔"]},
+  {c:"唐代佛教人物（写出 4 位以上）", a:["玄奘","鉴真","慧能","神秀","义净","一行","道宣","善导","不空"]},
+  {c:"中国史上以少胜多的战役（写出 5 个以上）", a:["巨鹿之战","昆阳之战","官渡之战","赤壁之战","淝水之战","鄱阳湖之战","萨尔浒之战","牧野之战"]},
+  {c:"唐代重要著作（写出 5 部以上）", a:["唐律疏议","大唐西域记","史通","通典","茶经","千金方","唐本草","大衍历"]},
+  {c:"唐代书法家（写出 4 位以上）", a:["颜真卿","柳公权","欧阳询","虞世南","褚遂良","张旭","怀素","李邕"]},
+  {c:"被后世冠以“某圣/某仙”的唐代人物（写出 4 位以上）", a:["李白（诗仙）","杜甫（诗圣）","王维（诗佛）","李贺（诗鬼）","吴道子（画圣）","张旭（草圣）","陆羽（茶圣）"]},
+  {c:"河朔三镇指哪三个藩镇？（写出 3 个）", a:["成德","魏博","卢龙"]}
+];
+
+const EMPS = [
+  {n:"高祖", p:"李渊", y0:618, y1:626, m:"开国", k:"wen", tags:["晋阳起兵","定都长安","玄武门之变"]},
+  {n:"太宗", p:"李世民", y0:626, y1:649, m:"玄武门之变后继位", ab:1, al:"天可汗", k:"sheng", tags:["贞观之治","灭东突厥","玄奘西行"]},
+  {n:"高宗", p:"李治", y0:649, y1:683, m:"以太子继位", al:"天皇", k:"wen", tags:["永徽之治","灭西突厥","二圣临朝"]},
+  {n:"中宗", p:"李显", y0:683, y1:684, m:"以太子继位，两月后被废", k:"luan", tags:["在位两月","被废"]},
+  {n:"睿宗", p:"李旦", y0:684, y1:690, m:"武则天所立，后让位", ab:1, k:"luan", tags:["武则天临朝","让位"]},
+  {n:"武则天", p:"武曌", y0:690, y1:705, m:"代唐建周", ab:1, al:"则天女皇", k:"wen", tags:["武周代唐","首创殿试","酷吏政治"]},
+  {n:"中宗", p:"李显", y0:705, y1:710, m:"神龙政变后复位", ab:1, k:"luan", tags:["神龙政变","韦后干政"]},
+  {n:"睿宗", p:"李旦", y0:710, y1:712, m:"唐隆政变后复位", ab:1, k:"luan", tags:["唐隆政变","太平公主干政"]},
+  {n:"玄宗", p:"李隆基", y0:712, y1:756, m:"两次政变后受禅", ab:1, al:"唐明皇 · 三郎", k:"sheng", tags:["开元盛世","安史之乱","马嵬驿之变"]},
+  {n:"肃宗", p:"李亨", y0:756, y1:762, m:"灵武自立", ab:1, k:"luan", tags:["灵武即位","两京收复","藩镇初起"]},
+  {n:"代宗", p:"李豫", y0:762, y1:779, m:"以太子继位", k:"wen", tags:["安史平定","吐蕃入长安","河朔三镇"]},
+  {n:"德宗", p:"李适", y0:779, y1:805, m:"以太子继位", k:"luan", tags:["两税法","泾原兵变","宦官掌神策军"]},
+  {n:"顺宗", p:"李诵", y0:805, y1:806, m:"以太子继位，八月后禅位", k:"luan", tags:["永贞革新","在位八月"]},
+  {n:"宪宗", p:"李纯", y0:805, y1:820, m:"宦官拥立", ab:1, k:"sheng", tags:["元和中兴","淮西之乱","被弑"]},
+  {n:"穆宗", p:"李恒", y0:820, y1:824, m:"以太子继位", k:"wen", tags:["长庆会盟","河朔复叛"]},
+  {n:"敬宗", p:"李湛", y0:824, y1:827, m:"以太子继位，后被宦官所弑", k:"luan", tags:["少年即位","被弑"]},
+  {n:"文宗", p:"李昂", y0:827, y1:840, m:"宦官拥立", ab:1, k:"luan", tags:["甘露之变","牛李党争"]},
+  {n:"武宗", p:"李炎", y0:840, y1:846, m:"宦官拥立", ab:1, k:"wen", tags:["会昌灭佛","大破回鹘"]},
+  {n:"宣宗", p:"李忱", y0:846, y1:859, m:"宦官拥立", ab:1, al:"小太宗", k:"wen", tags:["大中之治","收复河湟"]},
+  {n:"懿宗", p:"李漼", y0:859, y1:873, m:"宦官拥立", ab:1, k:"luan", tags:["庞勋起义","迎佛骨"]},
+  {n:"僖宗", p:"李儇", y0:873, y1:888, m:"宦官拥立", ab:1, al:"击球状元", k:"luan", tags:["黄巢起义","奔蜀"]},
+  {n:"昭宗", p:"李晔", y0:888, y1:904, m:"宦官拥立，后被弑", ab:1, k:"luan", tags:["朱温入关","被弑"]},
+  {n:"哀帝", p:"李柷", y0:904, y1:907, m:"朱温拥立，禅让", ab:1, k:"luan", tags:["禅让","唐亡"]}
+];
+
+const KIND = { emp:"皇位", pow:"权力", war:"战争", ppl:"人物", cul:"文化", rel:"文物" };
+
+const CH = [
+{ id:"c1", y:"617–626", s:617, e:626, t:"建国的八年，是关陇集团内部的一次摊牌",
+  lead:"李渊靠关陇军事贵族的支持入主长安，但太子建成与秦王世民的军功差距，让继承问题从一开始就无解。<b>玄武门不是意外，是这套权力结构的必然出口。</b>",
+  items:[
+    {t:"晋阳起兵", y:617, k:"war", d:"李渊以“尊隋”为名在太原起兵，南下渡河，年底攻入长安，立杨侑为傀儡皇帝。半年多就拿下关中枢纽，靠的是关陇集团的军事网络。"},
+    {t:"唐朝建立", y:618, k:"emp", d:"李渊在长安称帝，国号唐，改元武德。此时全国还有窦建德、王世充、萧铣等割据势力，唐朝只是众多政权之一。"},
+    {t:"统一战争", y:620, k:"war", d:"李世民先后平定薛举、刘武周、王世充、窦建德，六年间基本统一中原。军功全部集中在秦王一人身上，这既是唐朝的本钱，也是继承危机的引信。"},
+    {t:"关陇集团", y:618, k:"pow", d:"李渊父子出自西魏以来的关陇军事贵族。唐初的宰相、将领几乎都出自这一网络，皇权必须与它共治。"},
+    {t:"三省六部", y:618, k:"pow", d:"沿隋制：中书省出令、门下省审议、尚书省执行，下辖六部。决策权被拆成三段，理论上防止任何一方独断。"},
+    {t:"均田制与租庸调", y:624, k:"pow", d:"武德七年颁均田令，丁男授田，租、庸、调以人丁为本。这套制度是府兵制的经济基础：有田才有自备资粮的兵。"},
+    {t:"玄武门之变", y:626, k:"emp", d:"李世民在玄武门杀太子建成、齐王元吉，逼李渊立自己为太子，两个月后受禅即位。唐朝的皇位继承从此带上了“兵变合法性”的底色。"},
+    {t:"李渊", y:618, k:"ppl", d:"唐朝开国皇帝。善于平衡各方势力，却在儿子之间的竞争中失去控制，成为太上皇。"},
+    {t:"李世民", y:626, k:"ppl", d:"唐朝实际的开创者。军功、人望、班底俱全，只差一个名分——玄武门解决的就是这个名分。"},
+    {t:"开元通宝", img:"Kai_Yuan_Tong_Bao_-_Dr._Luke_Roberts.jpg", y:621, k:"rel", glyph:"钱", mus:"中国国家博物馆", d:"废止五铢、开创“通宝”钱制，钱文由欧阳询书写。", long:"唐初仍用隋五铢，钱轻物重。武德四年（621）废五铢，改铸“开元通宝”——“开元”意为开创新纪元，并非年号。钱文由欧阳询以隶书书写，端庄匀称，是唐代书法的日常样本。此后“通宝”“元宝”成为历代钱币的通名，直到清末。一枚开元通宝重约四克，十枚为一两，这套“钱—两”关系影响了此后一千年的度量衡。", facts:[["年代","唐 · 武德四年（621）始铸"],["材质","铜合金"],["形制","圆形方孔"],["馆藏","中国国家博物馆"]]},
+    {t:"长孙无忌", y:626, k:"ppl", d:"李世民妻兄、玄武门之变的主谋之一，凌烟阁功臣排名第一。高宗朝因反对立武则天为后被贬，自缢而死。"},
+    {t:"李靖", y:621, k:"ppl", d:"唐初第一名将。平萧铣、辅公祏，630 年雪夜袭阴山灭东突厥。后世兵书多托其名。"},
+    {t:"尉迟敬德", y:626, k:"ppl", d:"原刘武周部将，归唐后成为李世民亲信。玄武门之变中射杀李元吉，与长孙无忌并列首功。"},
+    {t:"秦叔宝", y:621, k:"ppl", d:"名琼，原瓦岗军将领。骁勇善战，凌烟阁二十四功臣之一；后世与尉迟敬德同为门神。"}
+  ],
+  chain:["关陇集团共治","军功集中于秦王","继承无解","玄武门之变"]
+},
+{ id:"c2", y:"627–649", s:627, e:649, t:"贞观不是道德故事，是一套能运转的制度",
+  lead:"三省六部分权、谏官制度、律令体系，加对外军事胜利，让唐朝在二十年间站稳。<b>代价是：这套体制高度依赖皇帝本人的克制。</b>",
+  items:[
+    {t:"贞观之治", y:627, k:"pow", d:"改元贞观。轻徭薄赋、精简官员、修定律令，人口与耕地恢复。后世把它当作治世范本，但它只持续了二十余年。"},
+    {t:"纳谏与魏征", y:630, k:"ppl", d:"魏征原为李建成幕僚，后被重用，前后进谏两百余事。谏官有权驳回诏令，是贞观政治最特别的设计。"},
+    {t:"灭东突厥", y:630, k:"war", d:"李靖夜袭阴山，俘颉利可汗。唐朝解除北疆最大威胁，太宗被西北诸部尊为“天可汗”。"},
+    {t:"天可汗", y:630, k:"pow", d:"这不是虚号：唐朝由此获得对草原诸部的册封权与调兵权，形成“皇帝＋可汗”的双重身份。"},
+    {t:"玄奘西行", y:629, k:"cul", d:"玄奘从长安出发，经西域入天竺，在那烂陀寺求学十余年。645 年回长安，带回佛经六百余部。"},
+    {t:"文成公主入藏", y:641, k:"war", d:"唐蕃和亲，公主经青海入吐蕃，带去佛像、典籍与工匠。唐蕃关系从此在战争与和亲之间反复。"},
+    {t:"灭高昌设安西都护府", y:640, k:"war", d:"唐军灭高昌，置安西都护府于交河城，西域经营制度化。丝绸之路的管控权回到中原政权手中。"},
+    {t:"房玄龄与杜如晦", y:629, k:"ppl", d:"“房谋杜断”——一个擅长谋划，一个擅长决断。贞观的行政效率，很大程度来自这套宰相班子。"},
+    {t:"《氏族志》", y:638, k:"cul", d:"太宗命高士廉重修《氏族志》，把皇族列为第一等，刻意压低崔、卢等山东旧姓。这是一次用官修谱牒重排社会等级的行动。"},
+    {t:"昭陵六骏", img:"Emperor_Taizong_Horse_Relief_Saluzi.jpg", y:636, k:"rel", glyph:"骏", mus:"西安碑林博物馆", d:"李世民六匹战马的浮雕，每匹有名字与战功。", long:"六骏是李世民在开国战争中骑过的六匹战马：拳毛䯄、什伐赤、白蹄乌、特勒骠、青骓、飒露紫。每块浮雕高约一米七，马身中箭仍作奔驰状。1914 年，飒露紫与拳毛䯄被盗运出国，现藏美国宾夕法尼亚大学考古与人类学博物馆；其余四骏 1918 年辗转入藏西安碑林。", facts:[["年代","唐 · 636—649"],["材质","石灰岩浮雕"],["原址","昭陵北阙"],["馆藏","西安碑林博物馆（两骏在美国宾大博物馆）"]]},
+    {t:"步辇图", img:"Emperor_Taizong_Receiving_the_Tibetan_Envoy(Bunian_Tu).jpg", y:641, k:"rel", glyph:"画", mus:"故宫博物院", d:"描绘禄东赞入唐迎文成公主，是唐蕃关系的图像史料。", long:"画面右侧是坐在步辇上的唐太宗，左侧为吐蕃使者禄东赞，由礼官引导。阎立本时任主爵郎中，据称亲历其事。现存卷为宋摹本，仍存唐画风貌。它记录的 641 年唐蕃和亲，可与《旧唐书·吐蕃传》相互印证。", facts:[["年代","唐 · 阎立本（存宋摹本）"],["材质","绢本设色"],["题材","禄东赞入唐"],["馆藏","故宫博物院"]]},
+    {t:"凌烟阁二十四功臣", y:643, k:"ppl", d:"太宗命阎立本绘二十四位功臣像于凌烟阁，褚遂良题名。长孙无忌居首，李靖、尉迟敬德、秦琼等皆在其中——一份官方钦定的开国功臣榜。"},
+    {t:"李勣", y:630, k:"ppl", d:"本名徐世勣，赐姓李。历事三朝，破东突厥、薛延陀，668 年灭高句丽。为人极谨慎，是太宗托孤的重臣。"},
+    {t:"虞世南", y:638, k:"ppl", d:"初唐四大书家之一，也是凌烟阁功臣中少见的文人。编《北堂书钞》，书法与欧阳询并称“欧虞”。"}
+  ],
+  chain:["三省分权","谏官制衡","皇帝克制","贞观之治"]
+},
+{ id:"c3", y:"649–705", s:649, e:705, t:"皇后变成皇帝：新官僚对旧贵族的一次总反攻",
+  lead:"高宗朝关陇集团仍在，武则天借科举出身的新官僚与酷吏系统，把旧贵族连根拔起。<b>她称帝不是孤例，是一个新权力基础成型的结果。</b>",
+  items:[
+    {t:"高宗李治", y:649, k:"emp", d:"太宗第九子，性格温和。在位期间版图最大，但健康不佳，政务逐渐交由皇后武则天处理。"},
+    {t:"武则天立后", y:655, k:"emp", d:"高宗废王皇后，立武则天为后。此举遭到长孙无忌、褚遂良等关陇元老激烈反对，失败者被逐出朝廷——这是新旧势力的一次正面交锋。"},
+    {t:"灭西突厥", y:657, k:"war", d:"苏定方破西突厥，唐朝疆域推进到中亚，设昆陵、濛池都护府。安西四镇的格局基本成型。"},
+    {t:"白江口之战", y:663, k:"war", d:"唐军与日本、百济联军战于白江口，唐军以少胜多。此战之后日本转向学习唐制，东亚秩序确立。"},
+    {t:"《唐律疏议》", y:653, k:"cul", d:"永徽年间编成，是中国现存最早、最完整的封建法典。律文＋疏议的结构，被后来的东亚各国广泛移植。"},
+    {t:"武则天称帝", y:690, k:"emp", d:"改国号为周，自称圣神皇帝。她是中国历史上唯一被普遍承认的女皇帝，时年六十七岁。"},
+    {t:"科举扩招与殿试", y:690, k:"pow", d:"武则天大幅增加进士科录取人数，并亲自殿试。新官僚由此形成，他们的权力来源是皇帝，而不是门第。"},
+    {t:"酷吏政治", y:690, k:"pow", d:"来俊臣、周兴等掌诏狱，用告密与刑讯清洗反对者。它是武则天摧毁旧贵族的手段，也是她失去人心的原因。"},
+    {t:"狄仁杰", y:690, k:"ppl", d:"武周时期最著名的宰相。既能在酷吏政治中自保，又促成了李显复位——他代表的是“回归李唐”的那股力量。"},
+    {t:"神龙政变", y:705, k:"emp", d:"张柬之等发动政变，逼武则天退位，中宗复位，恢复唐国号。武周结束，但皇位继承的混乱才刚开始。"},
+    {t:"龙门卢舍那大佛", img:"Ancient_Buddhist_Grottoes_at_Longmen-_Fengxian_Temple,_Colossal_Statue_of_Vairocana.jpg", y:675, k:"rel", glyph:"佛", mus:"洛阳龙门石窟", d:"通高约 17 米，面容丰润，是盛唐造像的巅峰。", long:"奉先寺大像龛由高宗敕建，皇后武则天捐脂粉钱两万贯助修，上元二年（675）完工。主尊卢舍那佛通高约 17 米，两侧为弟子、菩萨、天王、力士。它的面相是盛唐审美与政治权力的合一：既是宗教造像，也是帝国的公共形象工程。", facts:[["年代","唐 · 上元二年（675）完工"],["材质","石灰岩"],["位置","龙门西山奉先寺"],["性质","石窟造像（非博物馆藏品）"]]},
+    {t:"苏定方", y:657, k:"ppl", d:"高宗朝名将。657 年灭西突厥，660 年渡海灭百济，把唐朝疆域推进到中亚。"},
+    {t:"薛仁贵", y:661, k:"ppl", d:"贞观末年从军，“三箭定天山”。后在大非川之战败于吐蕃；民间演义中形象极盛。"},
+    {t:"来俊臣", y:690, k:"ppl", d:"武则天朝酷吏。与周兴等掌诏狱，编《罗织经》；后以谋反罪被处死。"},
+    {t:"王勃", y:675, k:"ppl", d:"\"初唐四杰\"之首，作《滕王阁序》。二十七岁渡海溺亡。"},
+    {t:"孙思邈", y:652, k:"ppl", d:"唐代医药学家，著《千金要方》《千金翼方》，后世尊为“药王”。"}
+  ],
+  chain:["关陇旧族把持朝政","武则天借科举新人","酷吏清洗","武周代唐"]
+},
+{ id:"c4", y:"705–741", s:705, e:741, t:"两次政变，换来四十年盛世",
+  lead:"神龙政变后，韦后、太平公主轮番干政，直到李隆基接连发动唐隆、先天两次政变才收束权力。<b>开元之治的前提，是先把宫廷政治彻底清场。</b>",
+  items:[
+    {t:"中宗复位", y:705, k:"emp", d:"李显复位，恢复唐国号。但他纵容韦后与安乐公主干政，朝政迅速败坏。"},
+    {t:"韦后乱政", y:707, k:"pow", d:"韦后效仿武则天干预朝政，与其女安乐公主卖官鬻爵。710 年传言韦后毒死中宗，成为唐隆政变的导火索。"},
+    {t:"唐隆政变", y:710, k:"emp", d:"李隆基联合太平公主发动政变，杀韦后与安乐公主，拥睿宗复位。李隆基被立为太子。"},
+    {t:"先天政变", y:713, k:"emp", d:"睿宗禅位后，太平公主仍握大权。李隆基先发制人，诛杀太平公主党羽，同年改元开元。至此，女主政治彻底终结。"},
+    {t:"开元盛世", y:713, k:"pow", d:"任姚崇、宋璟为相，裁汰冗官、整顿吏治、兴修水利。户口与财政收入大幅增长，杜甫后来追忆“忆昔开元全盛日”。"},
+    {t:"姚崇与宋璟", y:713, k:"ppl", d:"姚崇提出“十事要说”作为拜相条件，宋璟以刚正守法著称。两人风格不同，却共同撑起开元前期。"},
+    {t:"张九龄", y:733, k:"ppl", d:"开元后期名相，以文学与正直著称。他反对重用李林甫、反对纵容安禄山，意见未被采纳，罢相成为开元转向天宝的标志。"},
+    {t:"府兵改募兵", y:722, k:"pow", d:"张说建议招募壮士充宿卫，府兵制开始瓦解。兵源从“有田的自耕农”变成“领饷的职业兵”，军队与将领的关系随之改变。"},
+    {t:"《大衍历》", y:728, k:"cul", d:"一行主持编修，是当时最精密的历法之一。他还主持了全国范围的天文测量，算出子午线一度的长度。"},
+    {t:"李白与杜甫", y:730, k:"ppl", d:"李白漫游天下，杜甫在洛阳应试落第。两人此时都还年轻，盛唐的自信与危机同时在他们身上生长。"},
+    {t:"三彩骆驼载乐俑", img:"Tang_Dynasty_musicians_on_camel,_723_ad.jpg", y:723, k:"rel", glyph:"俑", mus:"中国国家博物馆", d:"骆驼背上七人乐队，胡汉乐手同台，是丝路交流的缩影。", long:"骆驼昂首直立，背上铺毯，七名乐手围坐演奏，中间一名胡人歌者。唐三彩是低温铅釉陶，主要用作明器。这件俑把西域的乐器、胡人的面孔和中原的墓葬制度放进同一件器物，是“胡风”进入日常生活的直接证据。", facts:[["年代","唐 · 开元年间"],["材质","陶胎三彩釉"],["出土","1957 年西安鲜于庭诲墓"],["馆藏","中国国家博物馆"]]},
+    {t:"太平公主", y:710, k:"ppl", d:"武则天之女。参与唐隆政变拥立睿宗，后与玄宗争权，713 年被赐死。"},
+    {t:"高力士", y:713, k:"ppl", d:"玄宗朝权宦，掌内侍省。安史之乱中随玄宗入蜀，晚年流放巫州。"},
+    {t:"吴道子", y:725, k:"ppl", d:"后世尊为“画圣”，擅佛道人物，有“吴带当风”之誉。曾在两京寺观作壁画三百余堵。"},
+    {t:"王维", y:721, k:"ppl", d:"诗人、画家，官至尚书右丞。苏轼评他“诗中有画，画中有诗”。"}
+  ],
+  chain:["女主政治反复","李隆基两次政变","权力收束","开元盛世"]
+},
+{ id:"c5", y:"742–763", s:742, e:763, t:"盛世在天宝十四年断成两截",
+  lead:"募兵制把边防军交给节度使，李林甫、杨国忠的专权又让中央失去制衡。<b>安禄山起兵不是边将造反那么简单，是军事—财政结构变了，中央却没跟上。</b>",
+  items:[
+    {t:"改元天宝", y:742, k:"pow", d:"玄宗改元天宝，此后逐渐怠于政事。开元时期的纳谏风气消失，宰相权力高度集中。"},
+    {t:"李林甫专权", y:742, k:"pow", d:"在相位十九年，排斥异己、堵塞言路。他为防边将入相，主张用胡人任节度使——安禄山正是这套政策的产物。"},
+    {t:"杨国忠", y:752, k:"pow", d:"杨贵妃族兄，继李林甫为相。与安禄山争权，多次向玄宗进言安禄山必反，反而加速了叛乱爆发。"},
+    {t:"怛罗斯之战", y:751, k:"war", d:"高仙芝率唐军与大食战于怛罗斯，因葛逻禄部倒戈而败。唐朝在中亚的扩张到此为止。"},
+    {t:"安史之乱", y:755, k:"war", d:"安禄山以范阳、平卢、河东三镇起兵，次年称帝，国号燕。叛军迅速攻陷洛阳、长安，唐朝由盛转衰。"},
+    {t:"马嵬驿之变", y:756, k:"emp", d:"玄宗逃往蜀地，至马嵬驿禁军哗变，杀杨国忠，逼死杨贵妃。玄宗继续入蜀，太子李亨北上灵武。"},
+    {t:"肃宗灵武即位", y:756, k:"emp", d:"李亨在灵武自行即位，尊玄宗为太上皇。这是非常时期的非常之举，也埋下了中央权威衰落的伏笔。"},
+    {t:"两京收复", y:757, k:"war", d:"借回纥兵，郭子仪等收复长安、洛阳。代价是回纥纵掠，以及大量降将原地受封——藩镇的种子由此埋下。"},
+    {t:"鉴真东渡", y:753, k:"cul", d:"鉴真第六次东渡成功抵达日本，在奈良建唐招提寺。此时唐朝内部已山雨欲来。"},
+    {t:"杜甫", y:759, k:"ppl", d:"安史之乱中流亡，写下“三吏”“三别”。他的诗被称为“诗史”，记录的是制度崩坏下普通人的处境。"},
+    {t:"颜真卿", y:755, k:"ppl", d:"安禄山叛乱时，颜真卿在平原郡起兵抵抗，河北十七郡响应。他的书法与气节在后世同样被推崇。"},
+    {t:"舞马衔杯纹银壶", img:"Gilt_silver_jar_with_pattern_of_dancing_horses.jpg", y:742, k:"rel", glyph:"壶", mus:"陕西历史博物馆", d:"壶身錾刻衔杯舞马，印证玄宗千秋节舞马祝寿的记载。", long:"壶为皮囊式，两面各錾一匹颈系飘带、口衔酒杯的舞马。唐玄宗生日“千秋节”，曾在勤政楼前令舞马表演：马闻乐起舞，衔杯上寿。安史之乱后舞马散失，这门技艺随之失传。此壶是文献之外几乎唯一的实物证据。", facts:[["年代","唐 · 8 世纪"],["材质","银，局部鎏金"],["出土","1970 年西安何家村窖藏"],["馆藏","陕西历史博物馆"]]},
+    {t:"簪花仕女图", img:"Zhou_Fang._Court_Ladies_Wearing_Flowered_Headdresses._Detail3.jpg", y:750, k:"rel", glyph:"画", mus:"辽宁省博物馆", d:"贵族妇女簪花游园，服饰妆容是盛唐时尚的一手材料。", long:"画卷描绘五位贵族妇女与一名侍女在庭院中赏花、戏犬、执扇。人物高髻簪花、薄纱透体，是研究唐代女性妆饰、服饰与贵族生活的关键图像。旧传为周昉所作，也有学者认为时代略晚。", facts:[["年代","唐 · 传周昉"],["材质","绢本设色"],["题材","贵族妇女游园"],["馆藏","辽宁省博物馆"]]},
+    {t:"杨贵妃", y:745, k:"ppl", d:"唐玄宗贵妃，“四大美女”之一。马嵬驿之变中被迫自尽，时年三十八。"},
+    {t:"高仙芝", y:751, k:"ppl", d:"高句丽裔唐将，长期镇守安西。怛罗斯之战败于大食，后因退守潼关被冤杀。"},
+    {t:"哥舒翰", y:756, k:"ppl", d:"突厥裔唐将，久镇河西。安史之乱中被迫出潼关迎战而败，降后被安庆绪所杀。"},
+    {t:"李光弼", y:757, k:"ppl", d:"契丹裔唐将，与郭子仪齐名。太原之战以少胜多，是平叛的关键统帅。"}
+  ],
+  chain:["府兵瓦解","节度使掌兵财","中央失去制衡","安史之乱"]
+},
+{ id:"c6", y:"763–805", s:763, e:805, t:"中央失去了兵，只剩下钱和名分",
+  lead:"河朔三镇名义归附、实则自立；朝廷靠两税法重建财政，靠宦官掌神策军维持禁军。<b>唐朝后半段的基本格局，这二十年定型。</b>",
+  items:[
+    {t:"安史之乱平定", y:763, k:"war", d:"史朝义自杀，乱事平定。但唐廷无力彻底清算降将，只得就地任命——河北藩镇由此合法化。"},
+    {t:"河朔三镇", y:763, k:"pow", d:"成德、魏博、卢龙三镇，节度使父子相承、赋税自专、军队自领。它们名义上是唐朝的藩镇，实际上是独立政权。"},
+    {t:"吐蕃入长安", y:763, k:"war", d:"吐蕃趁唐朝虚弱攻入长安，代宗出逃。此后吐蕃长期威胁关中，唐朝不得不重兵屯守京西。"},
+    {t:"杨炎与两税法", y:780, k:"pow", d:"废除租庸调，改按资产与田亩征税，分夏秋两次征收。征税对象从“人丁”转向“财产”，是中国赋税史的分水岭。"},
+    {t:"泾原兵变", y:783, k:"war", d:"泾原兵途经长安哗变，德宗出逃奉天。叛军拥朱泚为帝，唐朝几乎再次亡国。"},
+    {t:"宦官掌神策军", y:784, k:"pow", d:"泾原兵变后，德宗不再信任武将，把禁军交给宦官窦文场、霍仙鸣。宦官由此掌握废立皇帝的资本。"},
+    {t:"陆羽《茶经》", y:780, k:"cul", d:"中国第一部茶学专著。它把饮茶从日常习惯提升为一门有器具、有品评、有流派的技艺。"},
+    {t:"韩愈与柳宗元", y:790, k:"ppl", d:"两人同倡古文，反对骈文。韩愈后来发起“古文运动”，直接影响宋代文风。"},
+    {t:"《通典》", y:801, k:"cul", d:"杜佑编成，中国第一部典章制度通史。它把“制度如何演变”本身当作历史来写。"},
+    {t:"葡萄花鸟纹银香囊", y:780, k:"rel", glyph:"囊", mus:"陕西历史博物馆", d:"内部机环结构让香盂始终水平，是唐代的陀螺仪。", long:"球体上下两半以子母扣开合，内部有两层同心机环和一个香盂。无论外球如何转动，香盂因重力始终保持水平，香灰不会倾出——唐代称之为“被中香炉”。安史之乱后玄宗欲改葬杨贵妃，记载称“肌肤已坏，而香囊仍在”，说的很可能就是这类金属香具。", facts:[["年代","唐 · 8 世纪"],["材质","银"],["出土","1970 年西安何家村窖藏"],["馆藏","陕西历史博物馆"]]},
+    {t:"镶金兽首玛瑙杯", img:"唐-玛瑙兽首杯.jpg", y:780, k:"rel", glyph:"杯", mus:"陕西历史博物馆", d:"整块玛瑙雕成，兽嘴镶金为塞，造型源自中亚“来通”。", long:"杯体用一整块缠丝玛瑙雕出，前端为兽首，兽嘴处镶金帽，拔下金帽即可注酒。这种角形酒器源自波斯、中亚的“来通”（rhyton），唐人用它饮葡萄酒。它是何家村窖藏中形制最异域的一件，也是丝路物质交流的直接物证。", facts:[["年代","唐 · 8 世纪"],["材质","缠丝玛瑙，兽嘴镶金"],["出土","1970 年西安何家村窖藏"],["馆藏","陕西历史博物馆"]]},
+    {t:"郭子仪", y:763, k:"ppl", d:"平定安史之乱的主帅，收复两京。后单骑退回纥，功高震主而能善终，被视为“功盖天下而主不疑”的典范。"},
+    {t:"陆贽", y:783, k:"ppl", d:"德宗朝宰相、政论家。所作制诰、奏议影响深远，有《陆宣公集》。"},
+    {t:"怀素", y:777, k:"ppl", d:"唐代草书大家，与张旭并称“颠张醉素”，以狂草闻名。"}
+  ],
+  chain:["降将受封","河朔三镇割据","中央财政危机","两税法重建财源"]
+},
+{ id:"c7", y:"805–835", s:805, e:835, t:"最后一次主动出击，然后彻底失手",
+  lead:"宪宗用十年削平淮西、淄青，靠的是财政恢复与宦官支持的禁军。<b>但他被弑之后，宦官从工具变成主人；甘露之变失败，文官集团退出权力核心。</b>",
+  items:[
+    {t:"永贞革新", y:805, k:"pow", d:"顺宗即位，王叔文、王伾推行改革，罢宫市、抑宦官。百余日后顺宗被迫禅位，改革失败，参与者被贬。"},
+    {t:"宪宗削藩", y:806, k:"war", d:"宪宗先后平定西川、镇海、淮西、淄青，藩镇纷纷归附。这是安史之乱后中央最成功的一次权力回收。"},
+    {t:"淮西之乱平定", y:817, k:"war", d:"李愬雪夜袭蔡州，擒吴元济。此战是元和中兴的顶点，也让其他藩镇短暂臣服。"},
+    {t:"元和中兴", y:817, k:"pow", d:"财政好转、藩镇收敛、朝廷威望回升。但它的基础是宪宗个人强势与宦官支持，制度并未改变。"},
+    {t:"宪宗被弑", y:820, k:"emp", d:"宪宗因服丹药暴怒，被宦官陈弘志等杀死于中和殿。宦官弑君而不受追究，标志着皇权已被宦官挟持。"},
+    {t:"牛李党争", y:821, k:"pow", d:"以牛僧孺、李德裕为首的两派争斗近四十年，贯穿六朝。争论表面是科举与门第，实质是官僚集团的利益分配。"},
+    {t:"甘露之变", y:835, k:"emp", d:"文宗与李训、郑注谋诛宦官，事泄，宦官仇士良率禁军大杀朝臣。此后“天下事皆决于北司”，文官彻底边缘化。"},
+    {t:"白居易《长恨歌》", y:806, k:"cul", d:"以玄宗与杨贵妃故事为题材的长篇叙事诗。它把政治灾难写成了个人悲剧，也塑造了后人对盛唐的想象。"},
+    {t:"古文运动", y:815, k:"cul", d:"韩愈、柳宗元提倡先秦两汉散体，反对骈俪文风。这场文学运动背后，是对“文以载道”的重新主张。"},
+    {t:"李愬", y:817, k:"ppl", d:"817 年雪夜袭蔡州，生擒吴元济，是元和中兴的关键一战。"},
+    {t:"李德裕", y:821, k:"ppl", d:"牛李党争中“李党”领袖，武宗朝宰相，主持会昌灭佛、击破回鹘。"}
+  ],
+  chain:["财政恢复","宪宗削藩成功","宦官掌禁军","甘露之变"]
+},
+{ id:"c8", y:"835–907", s:835, e:907, t:"不是亡于一场叛乱，而是亡于没人能再统一",
+  lead:"会昌灭佛充实国库，却救不了财政结构；黄巢横扫南北，把藩镇格局彻底打散；朱温在这样的废墟上接手，<b>唐亡只是最后一道手续</b>。",
+  items:[
+    {t:"会昌灭佛", y:845, k:"pow", d:"武宗下令拆寺四千六百余所，勒令僧尼还俗二十六万余人，收田产充公。短期内缓解财政，也重创佛教。"},
+    {t:"大中暂治", y:846, k:"pow", d:"宣宗即位后抑制宦官、整顿吏治，史称“大中之治”。但他并未改变藩镇与宦官的结构，只是延缓了崩溃。"},
+    {t:"庞勋起义", y:868, k:"war", d:"戍守桂州的徐州兵因久戍不归而哗变，北上攻掠。起义虽被平定，却暴露了唐朝对地方军队的失控。"},
+    {t:"黄巢起义", y:875, k:"war", d:"黄巢响应王仙芝起兵，转战南北，从山东打到广州，再北上攻破洛阳、长安。这是唐朝最致命的一次内乱。"},
+    {t:"黄巢入长安", y:881, k:"war", d:"黄巢称帝，国号大齐。唐僖宗逃往成都。此后唐朝的财政收入几乎完全依赖东南藩镇。"},
+    {t:"藩镇林立", y:885, k:"pow", d:"黄巢之乱后，各地节度使拥兵自重，朝廷能直接控制的只剩关中一隅。所谓“唐朝”，此时已是一个空壳。"},
+    {t:"朱温", y:883, k:"ppl", d:"黄巢部将，降唐后赐名全忠，逐步吞并中原藩镇。他最终成为唐朝的掘墓人。"},
+    {t:"白马之祸", y:905, k:"pow", d:"朱温在白马驿杀宰相裴枢等朝臣三十余人，投尸黄河。唐朝的文官体系至此被彻底摧毁。"},
+    {t:"唐亡", y:907, k:"emp", d:"朱温废哀帝，自立为帝，国号梁，史称后梁。唐朝结束，五代十国开始。"},
+    {t:"李商隐与杜牧", y:845, k:"ppl", d:"晚唐诗人。李商隐的隐晦与杜牧的俊爽，都带着对盛衰的清醒——他们写的是一个已经知道结局的时代。"},
+    {t:"法门寺八重宝函", y:873, k:"rel", glyph:"函", mus:"法门寺博物馆", d:"八层函匣层层套叠，最内供奉佛指舍利。", long:"八重宝函由外而内层层套叠，材质从檀香木、银、金到玉石，最内是一座宝珠顶单檐四门纯金塔，塔内立佛指舍利。1987 年地宫发掘，封闭一千一百余年的唐代皇家供奉重见天日。", facts:[["年代","唐 · 咸通年间"],["材质","木、银、金、玉石"],["出土","1987 年法门寺地宫"],["馆藏","法门寺博物馆"]]},
+    {t:"法门寺秘色瓷", y:874, k:"rel", glyph:"瓷", mus:"法门寺博物馆", d:"地宫物账碑写明“瓷秘色”，一举解决了它的身份问题。", long:"“秘色瓷”之名长期只见于文献，宋代以后连它指什么都说不清。1987 年法门寺地宫出土十余件青瓷，同出的物账碑上明确写着“瓷秘色”，从此有了标准器。釉色青绿、胎质细腻，唐人“千峰翠色”的形容终于有了实物对应。", facts:[["年代","唐 · 9 世纪"],["材质","青瓷"],["出土","1987 年法门寺地宫"],["馆藏","法门寺博物馆"]]},
+    {t:"《金刚经》刻本", img:"Jingangjing.png", y:868, k:"rel", glyph:"经", mus:"大英图书馆", d:"现存最早有明确纪年的雕版印刷品，咸通九年（868）。", long:"卷末题记“咸通九年四月十五日王玠为二亲敬造普施”，使它成为现存最早有明确纪年的雕版印刷品。1900 年发现于敦煌藏经洞，后入藏大英博物馆，今归大英图书馆。雕版线条流畅，说明印刷术在 9 世纪已相当成熟。", facts:[["年代","唐 · 咸通九年（868）"],["材质","纸本墨印，卷轴装"],["出土地","敦煌莫高窟藏经洞"],["馆藏","大英图书馆"]]},
+    {t:"张议潮", y:848, k:"ppl", d:"848 年率沙州民众起兵，收复河西十一州并归附唐朝。敦煌 156 窟有《张议潮统军出行图》。"}
+  ],
+  chain:["财政枯竭","黄巢之乱","藩镇彻底失控","朱温篡唐"]
+}
+];
+
+/* ============================================================
+   渲染
+   ============================================================ */
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* 顶部章节点 */
+$("#dots").innerHTML = CH.map((c, i) =>
+  `<button class="dot" data-i="${i}" title="${c.y} ${c.t}">${i + 1}</button>`).join("");
+
+/* 皇位竖轴 */
+const abCount = EMPS.filter(e => e.ab).length;
+$("#rstat").innerHTML = "21 位皇帝 · " + EMPS.length + " 次即位 · 其中 <b>" + abCount + "</b> 次非正常（政变、拥立、自立、代唐、禅让）";
+
+function empHTML(e, i) {
+  const tags = (e.tags || []).map(t => `<span class="tg">${t}</span>`).join("");
+  const al = e.al ? `<span class="al">${e.al}</span>` : "";
+  const cls = [i % 2 === 0 ? "L" : "R", e.k || "wen", e.ab ? "ab" : ""].join(" ");
+  return `<button class="tl-item ${cls}" data-i="${i}" data-y="${e.y0}"
+    title="${e.n}${e.p ? " " + e.p : ""} ${e.y0}–${e.y1}｜${e.m}">
+    <span class="tl-mid"><span class="tdot"></span></span>
+    <span class="tl-card">
+      <span class="row1"><span class="yr">${e.y0}–${e.y1}</span><span class="nm"><b>${e.n}</b><span class="pn">${e.p}</span>${al}</span></span>
+      <span class="tags">${tags}</span>
+    </span>
+  </button>`;
+}
+$("#tlwrap").innerHTML = EMPS.map((e, i) => empHTML(e, i)).join("");
+
+/* 章节正文 */
+$("#chapters").insertAdjacentHTML("beforeend", CH.map((c, ci) => {
+  const ruled = EMPS.filter(e => e.y0 <= c.e && e.y1 >= c.s);
+  const chips = ruled.map(e => `<span class="rchip">${e.n}${e.p ? " " + e.p : ""}</span>`).join("");
+  return `
+  <section class="ch" id="${c.id}" data-i="${ci}">
+    <div class="chhead"><span class="chy">${c.y}</span><span class="rulerow">${chips}</span><button class="quizchip" data-c="${c.id}">考这一章</button></div>
+    <h2 class="cht">${c.t}</h2>
+    <p class="chlead">${c.lead}</p>
+    <div class="grid">
+      ${c.items.map((it, j) => `
+        <button class="it k-${it.k}" data-c="${c.id}" data-j="${j}">
+          <span class="top"><span class="iy">${it.y}</span><span class="ik">${KIND[it.k]}</span></span>
+          <span class="it-t">${it.t}</span>
+          <span class="it-d">${it.d}</span>
+          ${it.mus ? '<span class="it-mus">' + it.mus + "</span>" : ""}
+        </button>`).join("")}
+    </div>
+    <div class="chain"><span class="cl">因果链</span>${
+      c.chain.map((n, i) => (i ? '<span class="ar">→</span>' : "") + `<span class="nd">${n}</span>`).join("")
+    }</div>
+  </section>`;
+}).join(""));
+
+/* ============================================================
+   交互
+   ============================================================ */
+
+function chapterIndexOf(year) {
+  for (let i = CH.length - 1; i >= 0; i--) if (year >= CH[i].s) return i;
+  return 0;
+}
+function goChapter(i) {
+  i = Math.max(0, Math.min(CH.length - 1, i));
+  const el = document.getElementById(CH[i].id);
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function setActive(i) {
+  $$(".dot").forEach((d, k) => d.classList.toggle("on", k === i));
+}
+
+$("#dots").addEventListener("click", e => {
+  const b = e.target.closest(".dot");
+  if (b) goChapter(+b.dataset.i);
+});
+
+/* 类别筛选 */
+$("#filters").addEventListener("click", e => {
+  const b = e.target.closest(".fchip");
+  if (!b) return;
+  $$(".fchip").forEach(c => c.classList.toggle("on", c === b));
+  document.body.dataset.f = b.dataset.f;
+});
+$("#prev").onclick = () => goChapter(cur - 1);
+$("#next").onclick = () => goChapter(cur + 1);
+document.querySelector(".tlwrap").addEventListener("click", e => {
+  const b = e.target.closest(".tl-item");
+  if (b) goChapter(chapterIndexOf(+b.dataset.y));
+});
+$("#jump").addEventListener("click", () => goChapter(0));
+
+/* 滚动高亮 */
+let cur = 0;
+const spy = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (en.isIntersecting) { cur = +en.target.dataset.i; setActive(cur); }
+  });
+}, { rootMargin: "-15% 0px -70% 0px", threshold: 0 });
+$$(".ch").forEach(s => spy.observe(s));
+setActive(0);
+
+
+/* ---------- 文物大图 ---------- */
+const commonsUrl = f => "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(f) + "?width=1000";
+const lbEl = $("#lightbox"), lbImg = $("#lbImg"), lbCap = $("#lbCap"), lbSrc = $("#lbSrc");
+function openLB(src, name, file) {
+  lbImg.src = src;
+  lbImg.alt = name;
+  lbCap.textContent = name;
+  if (file) { lbSrc.href = "https://commons.wikimedia.org/wiki/File:" + encodeURIComponent(file); lbSrc.style.display = ""; }
+  else { lbSrc.style.display = "none"; }
+  lbEl.classList.add("on");
+}
+function closeLB() { lbEl.classList.remove("on"); lbImg.removeAttribute("src"); }
+$("#lbClose").onclick = closeLB;
+lbEl.addEventListener("click", e => { if (e.target === lbEl) closeLB(); });
+$("#mBody").addEventListener("click", e => {
+  const f = e.target.closest(".mfig");
+  if (!f || f.classList.contains("noimg")) return;
+  const img = f.querySelector("img");
+  if (img) openLB(img.src, f.dataset.name, f.dataset.file);
+});
+
+/* 弹窗 */
+const mask = $("#mask");
+function openItem(cid, j) {
+  const c = CH.find(x => x.id === cid);
+  const it = c.items[j];
+  $("#mTitle").textContent = it.t;
+  $("#mMeta").textContent = `${it.y} 年 · ${KIND[it.k]} · ${c.y} ${c.t}`;
+  if (it.facts) {
+    const rows = it.facts.map(f => '<div class="mrow"><span class="mk">' + f[0] + '</span><span class="mv">' + f[1] + '</span></div>').join("");
+    const pic = '<a class="mart" target="_blank" rel="noopener" href="https://image.baidu.com/search/index?tn=baiduimage&word=' +
+      encodeURIComponent(it.t) + '">看实拍图 ↗</a>';
+    const fig = '<div class="mfig' + (it.img ? "" : " noimg") + '" data-file="' + (it.img || "") + '" data-name="' + it.t + '">' +
+      (it.img ? '<img alt="' + it.t + '" src="' + commonsUrl(it.img) + '">' : "") +
+      '<span class="mfig-ph">' + (it.glyph || "文") + '</span></div>';
+    $("#mBody").innerHTML = '<div class="mlabel"><div class="mglyph">' + it.glyph + '</div>' + fig +
+      '<div class="mfacts">' + rows + pic + "</div></div>" +
+      '<div class="mtext">' + it.long + "</div>";
+    $$("#mBody .mfig img").forEach(img => {
+      img.onerror = () => img.parentNode.classList.add("noimg");
+      setTimeout(() => { if (!img.complete || img.naturalWidth === 0) img.parentNode.classList.add("noimg"); }, 2500);
+    });
+  } else {
+    $("#mBody").innerHTML = '<div class="mtext">' + it.d + "</div>";
+  }
+  const others = c.items.filter((x, k) => k !== j);
+  $("#mRel").innerHTML = `<div class="rl">同一时期</div><div class="tags">` +
+    others.map(o => `<button class="tag" data-t="${o.t}">${o.t}</button>`).join("") + `</div>`;
+  mask.classList.add("on");
+}
+function closeModal() { mask.classList.remove("on"); }
+$("#mClose").onclick = closeModal;
+mask.addEventListener("click", e => { if (e.target === mask) closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeLB(); closeModal(); } });
+
+$("#chapters").addEventListener("click", e => {
+  const b = e.target.closest(".it");
+  if (b) openItem(b.dataset.c, +b.dataset.j);
+});
+$("#mRel").addEventListener("click", e => {
+  const b = e.target.closest(".tag");
+  if (!b) return;
+  const title = b.dataset.t;
+  for (const c of CH) {
+    const j = c.items.findIndex(x => x.t === title);
+    if (j >= 0) {
+      closeModal();
+      const el = document.getElementById(c.id);
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => openItem(c.id, j), 320);
+      return;
+    }
+  }
+});
+
+/* 键盘左右切章 */
+document.addEventListener("keydown", e => {
+  if (mask.classList.contains("on") || document.getElementById("sheet").classList.contains("on")) return;
+  if (e.key === "ArrowRight") goChapter(cur + 1);
+  if (e.key === "ArrowLeft") goChapter(cur - 1);
+});
+</script>
+
+<script>
+/* ============================================================
+   闯关：快问快答 / 时间轴插卡 / 联想发散
+   ============================================================ */
+(function () {
+  const qs = s => document.querySelector(s);
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+  const sheet = qs("#sheet");
+  const VIEWS = ["menu", "quiz", "tl", "as", "res"];
+  const S = { timer: null, chapter: null, replay: null };
+
+  const TITLES = { menu: "闯关", quiz: "快问快答", tl: "时间轴插卡", as: "联想发散", res: "本局结果" };
+  const show = v => { VIEWS.forEach(x => qs("#v-" + x).classList.toggle("on", x === v)); qs("#vTitle").textContent = TITLES[v]; };
+  function open() { sheet.classList.add("on"); document.body.style.overflow = "hidden"; }
+  function close() { sheet.classList.remove("on"); document.body.style.overflow = ""; stop(); show("menu"); }
+  function stop() { if (S.timer) { clearInterval(S.timer); S.timer = null; } }
+  function tick(fn) { stop(); S.timer = setInterval(fn, 100); }
+
+  qs("#bankSize").textContent = QB.length;
+  qs("#playBtn").onclick = () => { open(); show("menu"); };
+  qs("#sheetClose").onclick = close;
+  qs("#resHome").onclick = close;
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && sheet.classList.contains("on")) close(); });
+
+  qs("#v-menu").addEventListener("click", e => {
+    const b = e.target.closest(".gcard");
+    if (!b) return;
+    if (b.dataset.g === "quiz") runQuiz(QB, 60, "全部 " + QB.length + " 题");
+    if (b.dataset.g === "tl") runTl();
+    if (b.dataset.g === "as") runAs();
+  });
+
+  qs("#chapters").addEventListener("click", e => {
+    const b = e.target.closest(".quizchip");
+    if (!b) return;
+    const ci = CH.findIndex(c => c.id === b.dataset.c);
+    const list = QB.filter(q => chapterIndexOf(q.y) === ci);
+    open();
+    const pool = list.length >= 3 ? list : QB;
+    runQuiz(pool, Math.max(45, Math.round(pool.length * 6)), "第 " + (ci + 1) + " 章 · " + CH[ci].y);
+  });
+
+  /* ---------------- 快问快答 ---------------- */
+  const Q = { list: [], i: 0, score: 0, combo: 0, right: 0, total: 0, wrong: [], locked: false, left: 60, span: 60 };
+
+  function prepareQs(list) {
+    return shuffle(list).map(q => {
+      const order = shuffle(q.o.map((t, i) => i));
+      return { y: q.y, q: q.q, n: q.n, s: q.s, o: order.map(i => q.o[i]), a: order.indexOf(q.a) };
+    });
+  }
+
+  function runQuiz(list, seconds, label) {
+    Q.list = prepareQs(list); Q.i = 0; Q.score = 0; Q.combo = 0; Q.right = 0; Q.total = 0;
+    Q.wrong = []; Q.locked = false; Q.left = seconds; Q.span = seconds;
+    qs("#qLabel").textContent = label;
+    qs("#qTime").textContent = seconds + "s";
+    qs("#qScore").textContent = "0";
+    qs("#qCombo").classList.remove("on");
+    qs("#qBar i").style.width = "100%";
+    show("quiz");
+    paintQ();
+    tick(() => {
+      Q.left -= 0.1;
+      if (Q.left <= 0) { Q.left = 0; finishQuiz(); return; }
+      qs("#qBar i").style.width = (Q.left / Q.span * 100) + "%";
+      qs("#qTime").textContent = Math.ceil(Q.left) + "s";
+    });
+    S.replay = () => runQuiz(list, seconds, label);
+  }
+
+  function paintQ() {
+    const q = Q.list[Math.min(Q.i, Q.list.length - 1)];
+    Q.cur = q;
+    qs("#qText").textContent = q.q;
+    qs("#qFb").innerHTML = "";
+    qs("#qNext").disabled = true;
+    qs("#qNext").textContent = "下一题";
+    qs("#qProg").textContent = (Q.i + 1) + " / " + Q.list.length;
+    const box = qs("#qOpts");
+    box.innerHTML = "";
+    q.o.forEach((t, i) => {
+      const b = document.createElement("button");
+      b.className = "qopt";
+      b.innerHTML = '<span class="k">' + (i + 1) + "</span><span>" + t + "</span>";
+      b.onclick = () => answerQ(i);
+      box.appendChild(b);
+    });
+    Q.locked = false;
+  }
+
+  function answerQ(i) {
+    if (Q.locked) return;
+    Q.locked = true;
+    const q = Q.cur, btns = Array.prototype.slice.call(qs("#qOpts").children);
+    btns.forEach(b => b.disabled = true);
+    btns[q.a].classList.add("ok");
+    Q.total++;
+    if (i === q.a) {
+      Q.right++; Q.combo++;
+      Q.score += 10 + Math.min(Q.combo - 1, 5) * 2;
+      qs("#qScore").textContent = Q.score;
+      if (Q.combo > 1) { qs("#qCombo").textContent = "连击 ×" + Q.combo; qs("#qCombo").classList.add("on"); }
+      qs("#qFb").innerHTML = "<b>对。</b>" + q.n + '<span class="qsrc">' + q.s + "</span>";
+    } else {
+      btns[i].classList.add("bad");
+      Q.combo = 0; qs("#qCombo").classList.remove("on");
+      Q.wrong.push({ q: q.q, a: q.o[q.a], n: q.n, s: q.s });
+      qs("#qFb").innerHTML = "<b>错。</b>正解「" + q.o[q.a] + "」。" + q.n + '<span class="qsrc">' + q.s + "</span>";
+    }
+    qs("#qNext").disabled = false;
+  }
+
+  qs("#qNext").onclick = () => {
+    if (qs("#qNext").disabled) return;
+    Q.i++;
+    if (Q.left <= 0 || Q.i >= Q.list.length) { finishQuiz(); return; }
+    paintQ();
+  };
+
+  document.addEventListener("keydown", e => {
+    if (!sheet.classList.contains("on") || !qs("#v-quiz").classList.contains("on")) return;
+    if (e.key >= "1" && e.key <= "3") {
+      const b = qs("#qOpts").children[Number(e.key) - 1];
+      if (b && !b.disabled) b.click();
+    } else if (e.key === "Enter") { e.preventDefault(); qs("#qNext").click(); }
+  });
+
+  function finishQuiz() {
+    stop();
+    if (Q.total === 0) { show("menu"); return; }
+    const acc = Math.round(Q.right / Q.total * 100);
+    const done = Q.i >= Q.list.length;
+    showResult("快问快答 · " + (done ? "全部答完" : "时间到"), Q.score,
+      "答对 " + Q.right + " / " + Q.total, "正确率 " + acc + "%", Q.wrong, S.replay);
+  }
+
+  /* ---------------- 时间轴插卡 ---------------- */
+  const T = { placed: [], picked: [], cur: null, lives: 3, locked: false };
+
+  function runTl() {
+    stop();
+    const pool = shuffle(EVENTS).slice(0, 8);
+    T.placed = pool.slice(0, 2).sort((a, b) => a.y - b.y);
+    T.picked = pool.slice(2);
+    T.lives = 3; T.locked = false;
+    qs("#tlLives").textContent = "❤❤❤";
+    qs("#tlFb").textContent = "";
+    show("tl");
+    nextTl();
+    S.replay = runTl;
+  }
+
+  function nextTl() {
+    if (!T.picked.length) { finishTl(); return; }
+    T.cur = T.picked.shift();
+    T.locked = false;
+    qs("#tlCard").textContent = T.cur.t;
+    qs("#tlFb").textContent = "";
+    paintTl();
+  }
+
+  function paintTl() {
+    const row = qs("#tlRow");
+    row.innerHTML = "";
+    for (let i = 0; i <= T.placed.length; i++) {
+      const b = document.createElement("button");
+      b.className = "tlslot";
+      b.textContent = "插在这里";
+      b.onclick = () => placeTl(i);
+      row.appendChild(b);
+      if (i < T.placed.length) {
+        const d = document.createElement("div");
+        d.className = "tlitem";
+        d.innerHTML = '<span class="yy">' + T.placed[i].y + "</span><span>" + T.placed[i].t + "</span>";
+        row.appendChild(d);
+      }
+    }
+  }
+
+  function placeTl(i) {
+    if (T.locked) return;
+    const y = T.cur.y;
+    const okL = i === 0 || T.placed[i - 1].y < y;
+    const okR = i === T.placed.length || y < T.placed[i].y;
+    T.locked = true;
+    if (okL && okR) {
+      T.placed.splice(i, 0, T.cur);
+      qs("#tlFb").innerHTML = "<b>对。</b>" + y + " 年，位置正好。";
+      paintTl();
+      setTimeout(nextTl, 520);
+      return;
+    }
+    T.lives--;
+    qs("#tlLives").textContent = "❤".repeat(Math.max(T.lives, 0)) + "♡".repeat(Math.max(3 - T.lives, 0));
+    let r = 0;
+    while (r < T.placed.length && T.placed[r].y < y) r++;
+    qs("#tlFb").innerHTML = "<b>错。</b>它应该插在第 " + (r + 1) + " 个空位，已帮你放好。";
+    T.placed.splice(r, 0, T.cur);
+    paintTl();
+    if (T.lives <= 0) { setTimeout(finishTl, 900); return; }
+    setTimeout(nextTl, 900);
+  }
+
+  function finishTl() {
+    stop();
+    const perfect = T.lives === 3;
+    showResult(perfect ? "时间轴 · 全部插对" : "时间轴 · 完成", Math.max(0, T.lives) * 100 + T.placed.length * 10,
+      "插对 " + T.placed.length + " 张", "剩余生命 " + Math.max(T.lives, 0), [], S.replay);
+  }
+
+  /* ---------------- 联想发散 ---------------- */
+  const A = { cat: null, left: 45, said: [], done: false, hit: 0 };
+
+  function runAs() {
+    stop();
+    A.cat = CATS[Math.floor(Math.random() * CATS.length)];
+    A.left = 45; A.said = []; A.done = false; A.hit = 0;
+    qs("#asCat").textContent = A.cat.c;
+    qs("#asTime").textContent = "45s";
+    qs("#asBar").style.width = "100%";
+    qs("#asChips").innerHTML = "";
+    qs("#asReveal").innerHTML = "";
+    qs("#asFb").textContent = "想到就写，回车提交；写错不扣分。";
+    qs("#asDone").style.display = "none";
+    const inp = qs("#asInput");
+    inp.value = ""; inp.disabled = false;
+    show("as");
+    setTimeout(() => inp.focus(), 60);
+    tick(() => {
+      A.left -= 0.1;
+      qs("#asTime").textContent = Math.ceil(Math.max(0, A.left)) + "s";
+      qs("#asBar").style.width = (Math.max(0, A.left) / 45 * 100) + "%";
+      if (A.left <= 0) finishAs();
+    });
+    S.replay = runAs;
+  }
+
+  const norm = t => t.replace(/[\s，。、,.;；:：()（）·"“”'‘’]/g, "");
+
+  function addChip() {
+    if (A.done) return;
+    const inp = qs("#asInput");
+    const v = inp.value.trim();
+    if (!v) return;
+    if (!A.said.some(x => norm(x) === norm(v))) {
+      A.said.push(v);
+      const c = document.createElement("span");
+      c.className = "achip";
+      c.textContent = v;
+      qs("#asChips").appendChild(c);
+    }
+    inp.value = "";
+  }
+
+  qs("#asInput").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addChip(); } });
+
+  function finishAs() {
+    if (A.done) return;
+    A.done = true;
+    stop();
+    qs("#asInput").disabled = true;
+    const used = new Set();
+    const rows = [];
+    let hit = 0;
+    A.cat.a.forEach(ans => {
+      const idx = A.said.findIndex((s, i) => !used.has(i) && (norm(ans).indexOf(norm(s)) >= 0 || norm(s).indexOf(norm(ans)) >= 0));
+      if (idx >= 0) { used.add(idx); hit++; rows.push({ t: ans, ok: true }); }
+      else rows.push({ t: ans, ok: false });
+    });
+    A.hit = hit;
+    qs("#asReveal").innerHTML = '<div class="rlabel">参考答案 · 命中 ' + hit + " / " + A.cat.a.length + "</div>" +
+      rows.map(r => '<div class="rv ' + (r.ok ? "hit" : "") + '"><span class="d"></span><span>' + r.t + "</span></div>").join("");
+    qs("#asFb").innerHTML = "你写了 <b>" + A.said.length + "</b> 个，其中 <b>" + hit + "</b> 个在参考答案里。";
+    qs("#asDone").style.display = "block";
+    S.replay = runAs;
+  }
+
+  qs("#asDone").onclick = () => {
+    showResult("联想发散 · 命中 " + A.hit, A.hit * 10 + A.said.length * 2,
+      "命中 " + A.hit + " / " + A.cat.a.length, "共写 " + A.said.length + " 个", [], S.replay);
+  };
+
+  /* ---------------- 结果 ---------------- */
+  function showResult(title, score, s1, s2, wrong, again) {
+    qs("#resTitle").textContent = title;
+    qs("#resScore").textContent = score;
+    qs("#resStats").innerHTML = "<span>" + s1 + "</span><span>" + s2 + "</span>";
+    qs("#resReview").innerHTML = wrong && wrong.length
+      ? '<div class="rlabel">错题回顾</div>' + wrong.map(w =>
+          '<div class="ritem"><div class="rq">' + w.q + '</div><div class="ra">✓ ' + w.a + "</div>" +
+          '<div class="rn">' + w.n + ' <span class="qsrc">' + w.s + "</span></div></div>").join("")
+      : "";
+    qs("#resAgain").onclick = again || (() => show("menu"));
+    show("res");
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.bak
+index.bak*.html
+.chrome-test/
+.chrome-shot/
+.chrome-probe/
+.s*.js

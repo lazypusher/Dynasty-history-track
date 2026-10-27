@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>唐朝闯关 · 快问快答</title>
+<style>
+  :root{
+    --paper:#f3ebe0; --paper2:#faf5ec; --ink:#211b17; --ink2:#5a4c41;
+    --red:#b23a2e; --gold:#c1903c; --jade:#2f6b57; --line:#d8c9b4;
+    --ok:#2f6b57; --bad:#b23a2e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:
+      radial-gradient(circle at 20% 0%, #fbf6ee 0%, transparent 55%),
+      radial-gradient(circle at 90% 100%, #efe2cf 0%, transparent 50%),
+      var(--paper);
+    color:var(--ink);
+    font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",SimSun,"STSong",serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{max-width:760px;margin:0 auto;padding:22px 18px 40px;min-height:100vh;display:flex;flex-direction:column}
+  .screen{display:none;flex:1;flex-direction:column;animation:fade .25s ease}
+  .screen.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ---------- home ---------- */
+  .brand{display:flex;align-items:center;gap:10px;margin:6px 0 2px}
+  .seal{
+    width:44px;height:44px;border-radius:8px;background:var(--red);color:#fff;
+    display:grid;place-items:center;font-size:20px;letter-spacing:1px;
+    box-shadow:0 3px 0 #8d2b21;
+  }
+  h1{font-size:26px;margin:0;letter-spacing:2px;font-weight:600}
+  .sub{color:var(--ink2);font-size:13px;letter-spacing:.5px;margin:6px 0 20px}
+  .modes{display:grid;gap:12px}
+  .mode{
+    display:flex;gap:14px;align-items:flex-start;text-align:left;width:100%;
+    background:var(--paper2);border:1px solid var(--line);border-radius:14px;
+    padding:16px 16px 14px;cursor:pointer;color:inherit;font-family:inherit;
+    transition:transform .12s ease, box-shadow .15s ease, border-color .15s;
+    box-shadow:0 1px 0 #e6dac8;
+  }
+  .mode:hover{transform:translateY(-2px);border-color:var(--gold);box-shadow:0 6px 16px rgba(90,60,30,.12)}
+  .mode:active{transform:translateY(0)}
+  .mode .ico{
+    flex:0 0 auto;width:38px;height:38px;border:1px solid var(--red);border-radius:7px;
+    color:var(--red);display:grid;place-items:center;font-size:19px;line-height:1;
+    background:#fff8f4;
+  }
+  .mode .t{font-size:17px;font-weight:600;letter-spacing:1px}
+  .mode .d{font-size:13px;color:var(--ink2);margin-top:4px;line-height:1.55}
+  .mode .tag{font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:1px 7px;margin-left:6px;vertical-align:2px}
+  .foot{margin-top:auto;padding-top:22px;display:flex;justify-content:space-between;align-items:center;color:var(--ink2);font-size:12px}
+  .linkbtn{background:none;border:none;color:var(--ink2);font-family:inherit;font-size:12px;cursor:pointer;text-decoration:underline dotted}
+  .badge{background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+  .howto{margin-top:22px;border-top:1px solid var(--line);padding-top:14px;color:var(--ink2);font-size:13px;line-height:1.72}
+  .howto .ht{font-size:11px;letter-spacing:3px;color:#8a6a35;margin-bottom:7px}
+  .howto p{margin:0 0 7px}
+  .howto b{color:var(--ink);font-weight:600}
+
+  /* ---------- shared game chrome ---------- */
+  .top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .top .back{background:none;border:1px solid var(--line);border-radius:9px;width:34px;height:34px;cursor:pointer;font-size:16px;color:var(--ink2);font-family:inherit}
+  .top .name{font-size:15px;letter-spacing:1px;color:var(--ink2)}
+  .score{margin-left:auto;font-size:15px;letter-spacing:1px}
+  .score b{color:var(--red);font-size:20px}
+  .combo{font-size:12px;color:var(--gold);opacity:0;transition:opacity .2s}
+  .combo.on{opacity:1}
+  .bar{height:5px;border-radius:3px;background:#e3d6c2;overflow:hidden;margin-bottom:18px}
+  .bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--jade),var(--gold));transition:width .1s linear}
+
+  .card{
+    background:var(--paper2);border:1px solid var(--line);border-radius:16px;
+    padding:22px 20px;box-shadow:0 2px 0 #e6dac8;
+  }
+  .q{font-size:20px;line-height:1.6;letter-spacing:.5px;min-height:64px}
+  .opts{display:grid;gap:9px;margin-top:18px}
+  .opt{
+    display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+    background:#fff;border:1px solid var(--line);border-radius:11px;padding:12px 14px;
+    font-size:16px;font-family:inherit;color:inherit;cursor:pointer;
+    transition:border-color .1s, background .1s, transform .08s;
+  }
+  .opt:hover{border-color:var(--gold)}
+  .opt:active{transform:scale(.995)}
+  .opt .k{width:22px;height:22px;border-radius:6px;background:#efe5d5;color:var(--ink2);font-size:12px;display:grid;place-items:center;flex:0 0 auto}
+  .opt.ok{border-color:var(--ok);background:#eaf3ee}
+  .opt.ok .k{background:var(--ok);color:#fff}
+  .opt.bad{border-color:var(--bad);background:#f8e9e6}
+  .opt.bad .k{background:var(--bad);color:#fff}
+  .opt[disabled]{cursor:default}
+  .fb{margin-top:14px;font-size:13.5px;line-height:1.6;color:var(--ink2);min-height:22px}
+  .fb b{color:var(--ink)}
+  .fb .src{display:inline-block;margin-left:6px;font-size:11px;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0 7px}
+  .next{
+    margin-top:16px;width:100%;padding:12px;border-radius:11px;border:none;cursor:pointer;
+    background:var(--ink);color:#f7efe3;font-family:inherit;font-size:15px;letter-spacing:2px;
+  }
+  .next:disabled{opacity:.35;cursor:default}
+
+  /* ---------- timeline ---------- */
+  .tl-wrap{margin-top:6px}
+  .lives{font-size:14px;letter-spacing:3px;color:var(--red)}
+  .tl-card{
+    background:#fff;border:1px solid var(--line);border-left:4px solid var(--red);
+    border-radius:10px;padding:14px 16px;font-size:17px;text-align:center;letter-spacing:.5px;
+    box-shadow:0 2px 8px rgba(90,60,30,.08);margin:14px 0;
+  }
+  .tl-list{display:flex;flex-direction:column;margin-top:4px}
+  .tl-item{
+    display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);
+    border-radius:8px;padding:7px 12px;font-size:14px;line-height:1.3;
+  }
+  .tl-item .yy{color:var(--gold);font-size:12px;min-width:34px;font-weight:600;letter-spacing:.5px}
+  .slot{
+    width:100%;height:24px;margin:4px 0;border:1px dashed var(--line);border-radius:7px;
+    background:#fbf6ee;color:#b9a68d;font-size:11px;cursor:pointer;font-family:inherit;
+    display:grid;place-items:center;letter-spacing:2px;transition:.12s;
+  }
+  .slot:hover{border-color:var(--gold);color:var(--gold);background:#fdf9f2}
+  .slot.hint{border-color:var(--ok);background:#eaf3ee;color:var(--ok)}
+  .slot.wrongpick{border-color:var(--bad);background:#f8e9e6;color:var(--bad)}
+
+  /* ---------- association ---------- */
+  .cat{font-size:15px;color:var(--ink2);letter-spacing:.5px}
+  .cat b{font-size:20px;color:var(--ink)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;min-height:34px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:13.5px}
+  .chip.hit{border-color:var(--ok);color:var(--ok);background:#eaf3ee}
+  .chip.miss{border-color:#e0cdb2;color:#a58e71;text-decoration:line-through}
+  .tin{
+    width:100%;margin-top:10px;padding:12px 14px;border:1px solid var(--line);border-radius:11px;
+    font-family:inherit;font-size:16px;background:#fff;color:var(--ink);outline:none;
+  }
+  .tin:focus{border-color:var(--gold)}
+  .reveal{margin-top:14px;display:grid;gap:6px}
+  .rv{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink2)}
+  .rv .dot{width:6px;height:6px;border-radius:50%;background:var(--line);flex:0 0 auto}
+  .rv.hit .dot{background:var(--ok)}
+  .rv.hit{color:var(--ok)}
+  .rvlabel{font-size:12px;color:var(--gold);margin-top:6px;letter-spacing:1px}
+
+  /* ---------- result ---------- */
+  .res-score{font-size:56px;line-height:1;color:var(--red);letter-spacing:-1px;margin:6px 0 4px}
+  .res-stats{display:flex;gap:18px;color:var(--ink2);font-size:13px;margin-top:8px;flex-wrap:wrap}
+  .review{margin-top:18px;max-height:38vh;overflow:auto;padding-right:4px}
+  .rev-item{border-top:1px dashed var(--line);padding:10px 0;font-size:13.5px;line-height:1.6}
+  .rev-item .qq{font-weight:600}
+  .rev-item .aa{color:var(--ok)}
+  .rev-item .nn{color:var(--ink2);font-size:12.5px;display:block;margin-top:2px}
+  .row{display:flex;gap:10px;margin-top:18px}
+  .row button{flex:1;padding:12px;border-radius:11px;font-family:inherit;font-size:15px;cursor:pointer;letter-spacing:1px}
+  .btn-main{background:var(--ink);color:#f7efe3;border:none}
+  .btn-ghost{background:none;border:1px solid var(--line);color:var(--ink2)}
+  .hintline{font-size:12px;color:#a58e71;margin-top:12px;text-align:center}
+  @media (prefers-reduced-motion: reduce){
+    .screen{animation:none !important}
+    *{transition:none !important}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ HOME ============ -->
+  <section id="home" class="screen active">
+    <div class="brand">
+      <div class="seal">唐</div>
+      <div>
+        <h1>唐朝闯关</h1>
+        <div class="sub">618 — 907 · 三关 · 全部可查证的史实</div>
+      </div>
+    </div>
+
+    <div class="modes">
+      <button class="mode" data-go="quiz">
+        <div class="ico">问</div>
+        <div>
+          <div class="t">快问快答 <span class="tag">60 秒</span></div>
+          <div class="d">答对连击加分，答错立刻给正确项 + 一句解释 + 出处。键盘 1 / 2 / 3 也能答。</div>
+        </div>
+      </button>
+      <button class="mode" data-go="timeline">
+        <div class="ico">序</div>
+        <div>
+          <div class="t">时间轴插卡 <span class="tag">3 条命</span></div>
+          <div class="d">把事件卡插进正确的时间位置。年份是硬的，骗不了人——插错就掉命。</div>
+        </div>
+      </button>
+      <button class="mode" data-go="assoc">
+        <div class="ico">联</div>
+        <div>
+          <div class="t">联想发散 <span class="tag">45 秒</span></div>
+          <div class="d">给一个类别，能写多少写多少，时间到揭晓参考答案。练的是"同类检索"，不是背年份。</div>
+        </div>
+      </button>
+    </div>
+
+    <div class="howto">
+      <div class="ht">怎么玩才有效</div>
+      <p><b>第一遍别求高分</b>，只求把错题看明白——每道错题的解析都标了出处，顺手翻一眼原文。</p>
+      <p><b>第二遍开始追连击</b>。连击逼你快，快才暴露"其实没记住"。</p>
+      <p><b>联想发散写不出来时</b>，先想"人—事—物"三类：谁参与？发生了什么？留下了什么？</p>
+    </div>
+
+    <div class="foot">
+      <span>题库 48 题 · 事件 19 个 · 类目 9 个</span>
+      <span class="badge" id="bestWrap">最高分 0</span>
+    </div>
+    <div class="hintline">所有题目都锚定正史与教科书级共识；不确定的一律不收。</div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="quiz" class="screen">
+    <div class="top">
+      <button class="back" data-go="home">←</button>
+      <span class="name">快问快答</span>
+      <span class="combo" id="combo">连击 ×2</span>
+      <span class="score">得分 <b id="score">0</b></span>
+    </div>
+    <div class="bar"><i id="bar" style="width:100%"></i></div>
+    <div class="card">
+      <div class="q" id="qText">…</div>
+      <div class="opts" id="opts"></div>
+      <div class="fb" id="fb"></div>
+      <button class="next" id="nextBtn" disabled>下一题</button>
+    </div>
+  </section>
+
+  <!-- ============ TIMELINE ============ -->
+  <section id="timeline" class="screen">
+    <div class="top">
+      <button class="back" data-go="home">←</button>
+      <span class="name">时间轴插卡</span>
+      <span class="lives" id="lives">❤❤❤</span>
+    </div>
+    <div class="card tl-wrap">
+      <div class="cat">把这张卡插到正确的位置（点虚线的空位）：</div>
+      <div class="tl-card" id="tlCard">…</div>
+      <div class="tl-list" id="tlRow"></div>
+      <div class="fb" id="tlHint"></div>
+    </div>
+  </section>
+
+  <!-- ============ ASSOC ============ -->
+  <section id="assoc" class="screen">
+    <div class="top">
+      <button class="back" data-go="home">←</button>
+      <span class="name">联想发散</span>
+      <span class="score"><b id="asTime">45</b>s</span>
+    </div>
+    <div class="bar"><i id="asBar" style="width:100%"></i></div>
+    <div class="card">
+      <div class="cat" id="asCat">…</div>
+      <div class="chips" id="asChips"></div>
+      <input class="tin" id="asInput" placeholder="输入一个答案，按回车添加…" autocomplete="off">
+      <div class="fb" id="asFb">想到就写，写错不扣分。</div>
+      <div class="reveal" id="asReveal"></div>
+      <button class="next" id="asDone" style="display:none">看结果</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULT ============ -->
+  <section id="result" class="screen">
+    <div class="card" style="margin-top:20px">
+      <div class="cat" id="resTitle">本局结束</div>
+      <div class="res-score" id="resScore">0</div>
+      <div class="res-stats" id="resStats"></div>
+      <div class="review" id="resReview"></div>
+      <div class="row">
+        <button class="btn-main" id="again">再来一局</button>
+        <button class="btn-ghost" data-go="home">回首页</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ==================================================================
+   数据：只收教科书级、可查证的事实；口径有争议的一律不收。
+   ================================================================== */
+
+const QB = [
+  {q:"唐朝建立于哪一年？", o:["617 年","618 年","620 年"], a:1, n:"李渊在长安称帝，国号唐，改元武德。", s:"《旧唐书·高祖本纪》"},
+  {q:"玄武门之变发生在哪一年？", o:["626 年","618 年","690 年"], a:0, n:"李世民在玄武门杀李建成、李元吉，随后被立为太子，同年即位。", s:"《资治通鉴》"},
+  {q:"唐太宗的年号是？", o:["开元","贞观","永徽"], a:1, n:"627 年改元贞观，贞观之治即指这一时期。", s:"《旧唐书·太宗本纪》"},
+  {q:"三省六部制中，负责审议、封驳诏令的是？", o:["中书省","门下省","尚书省"], a:1, n:"中书出令、门下审议、尚书执行，三者分工制衡。", s:"《唐六典》"},
+  {q:"唐代科举中地位最高、最难考的科目是？", o:["明经科","进士科","制科"], a:1, n:"进士科录取极少，有“三十老明经，五十少进士”之说。", s:"《通典·选举典》"},
+  {q:"安史之乱爆发于哪一年？", o:["745 年","755 年","763 年"], a:1, n:"安禄山在范阳起兵，次年攻入洛阳、长安。", s:"《资治通鉴》"},
+  {q:"安史之乱前后持续了约多少年？", o:["4 年","8 年","15 年"], a:1, n:"755 年爆发，763 年史朝义自杀，乱事平定。", s:"《旧唐书·玄宗本纪》"},
+  {q:"提出并推行两税法的是？", o:["杨炎","刘晏","宇文融"], a:0, n:"780 年推行，按资产与田亩征税，改变以人丁为本的旧制。", s:"《旧唐书·杨炎传》"},
+  {q:"唐朝灭亡于哪一年？", o:["875 年","907 年","960 年"], a:1, n:"朱温废哀帝，唐亡；同年建后梁，五代开始。", s:"《旧唐书·哀帝本纪》"},
+  {q:"取代唐朝、建立后梁的是？", o:["朱温","李克用","黄巢"], a:0, n:"朱温原为黄巢部将，降唐后势力坐大，最终篡唐。", s:"《旧五代史》"},
+  {q:"中国历史上唯一被普遍承认的女皇帝是？", o:["吕后","武则天","慈禧"], a:1, n:"690 年称帝，改国号为周，705 年神龙政变后退位。", s:"《旧唐书·则天皇后本纪》"},
+  {q:"武则天称帝后，改国号为？", o:["周","汉","魏"], a:0, n:"史称“武周”，但她仍被视为唐朝帝系的一部分。", s:"《新唐书·则天皇后本纪》"},
+  {q:"唐玄宗前期的年号是？", o:["开元","天宝","贞观"], a:0, n:"713 年改元开元；后期改元天宝，由盛转衰。", s:"《旧唐书·玄宗本纪》"},
+  {q:"唐玄宗之后即位的皇帝是？", o:["唐高宗","唐肃宗","唐代宗"], a:1, n:"安史之乱中玄宗入蜀，肃宗在灵武即位。", s:"《旧唐书·肃宗本纪》"},
+  {q:"《唐律疏议》颁行于哪位皇帝时期？", o:["唐太宗","唐高宗","唐玄宗"], a:1, n:"永徽年间编成，是中国现存最早、最完整的封建法典。", s:"《旧唐书·刑法志》"},
+  {q:"文成公主入藏，嫁给了谁？", o:["松赞干布","尺带珠丹","噶尔·东赞"], a:0, n:"641 年入吐蕃，唐蕃通婚自此开始。", s:"《旧唐书·吐蕃传》"},
+  {q:"玄奘西行求法回国后，主要在长安哪座寺院译经？", o:["白马寺","大慈恩寺","少林寺"], a:1, n:"大慈恩寺即今西安大雁塔所在；《大唐西域记》由他口述。", s:"《大慈恩寺三藏法师传》"},
+  {q:"禅宗六祖是？", o:["神秀","慧能","道宣"], a:1, n:"“菩提本无树”一偈，标志禅宗南宗的顿悟法门。", s:"《坛经》"},
+  {q:"鉴真六次东渡，最终到达？", o:["新罗","日本","天竺"], a:1, n:"753 年抵达日本，在奈良建唐招提寺。", s:"《唐大和上东征传》"},
+  {q:"751 年，唐军与大食交战于？", o:["怛罗斯","高昌","碎叶"], a:0, n:"唐军失利，造纸术西传之说常系于此役。", s:"《旧唐书·西戎传》"},
+  {q:"被称为“诗仙”的唐代诗人是？", o:["杜甫","李白","白居易"], a:1, n:"李白诗风豪放飘逸；杜甫为“诗圣”。", s:"《新唐书·文艺传》"},
+  {q:"被称为“诗圣”的唐代诗人是？", o:["杜甫","王维","李贺"], a:0, n:"杜甫诗被称为“诗史”，记录安史之乱前后的社会。", s:"《新唐书·文艺传》"},
+  {q:"《长恨歌》的作者是？", o:["白居易","元稹","李商隐"], a:0, n:"以唐玄宗与杨贵妃故事为题材的长篇叙事诗。", s:"《白氏长庆集》"},
+  {q:"倡导“古文运动”的唐代文学家是？", o:["韩愈","刘禹锡","温庭筠"], a:0, n:"反对骈文、提倡先秦两汉散体，与柳宗元并称“韩柳”。", s:"《旧唐书·韩愈传》"},
+  {q:"被后世尊为“画圣”的唐代画家是？", o:["阎立本","吴道子","周昉"], a:1, n:"吴道子擅佛道人物，有“吴带当风”之誉。", s:"《历代名画记》"},
+  {q:"“颜筋柳骨”中的“颜”指？", o:["颜真卿","颜之推","颜师古"], a:0, n:"颜真卿楷书雄浑，柳公权骨力劲健。", s:"《新唐书·颜真卿传》"},
+  {q:"《茶经》的作者是？", o:["陆羽","卢仝","皎然"], a:0, n:"中国第一部茶学专著，陆羽被后世称为“茶圣”。", s:"《新唐书·隐逸传》"},
+  {q:"唐代主持天文测量、算出子午线一度的僧人是？", o:["一行","善导","不空"], a:0, n:"一行与南宫说等实测，编《大衍历》。", s:"《旧唐书·方伎传》"},
+  {q:"安史之乱中死守睢阳的是？", o:["张巡","李光弼","哥舒翰"], a:0, n:"张巡、许远守睢阳阻叛军南下，城破殉难。", s:"《旧唐书·张巡传》"},
+  {q:"安史之乱的发动者是？", o:["安禄山","史朝义","朱泚"], a:0, n:"安禄山以范阳、平卢、河东三镇起兵，史思明继之。", s:"《旧唐书·安禄山传》"},
+  {q:"安史之乱平定后，唐朝中央与地方的主要矛盾是？", o:["藩镇割据","外戚专权","南北朝的遗留"], a:0, n:"河朔三镇（成德、魏博、卢龙）名义归附、实则自立。", s:"《新唐书·藩镇传》"},
+  {q:"唐后期宦官掌握的精锐禁军是？", o:["神策军","府兵","金吾卫"], a:0, n:"宦官掌神策军后，废立皇帝皆由其操纵。", s:"《旧唐书·宦官传》"},
+  {q:"“牛李党争”主要发生在哪段时期？", o:["唐太宗至高宗","唐穆宗至唐宣宗","唐僖宗至昭宗"], a:1, n:"以牛僧孺、李德裕为首的两派争斗近四十年。", s:"《新唐书·牛僧孺传》"},
+  {q:"甘露之变发生在哪一年？", o:["835 年","755 年","875 年"], a:0, n:"唐文宗谋诛宦官失败，反遭挟持，此后宦官气焰更盛。", s:"《资治通鉴》"},
+  {q:"会昌灭佛发生在哪位皇帝在位时？", o:["唐武宗","唐宣宗","唐懿宗"], a:0, n:"845 年下令拆寺汰僧，是“三武一宗”法难之一。", s:"《旧唐书·武宗本纪》"},
+  {q:"黄巢起义爆发于哪一年？", o:["835 年","875 年","907 年"], a:1, n:"王仙芝、黄巢起兵，881 年攻入长安。", s:"《旧唐书·黄巢传》"},
+  {q:"唐朝的都城长安，是今天的？", o:["洛阳","西安","开封"], a:1, n:"唐长安城在汉长安城东南，今西安市区。", s:"《唐两京城坊考》"},
+  {q:"唐朝前期的兵役制度是？", o:["府兵制","募兵制","卫所制"], a:0, n:"府兵自备资粮、定期宿卫；均田制破坏后难以为继。", s:"《新唐书·兵志》"},
+  {q:"唐初的赋税制度是？", o:["租庸调","两税法","一条鞭法"], a:0, n:"以人丁为本，租、庸、调三项；780 年被两税法取代。", s:"《旧唐书·食货志》"},
+  {q:"唐代在广州设管理对外贸易的官职是？", o:["市舶使","转运使","盐铁使"], a:0, n:"唐玄宗时设市舶使，掌海上贸易征税。", s:"《旧唐书·职官志》"},
+  {q:"唐朝与吐蕃在 821 年会盟，史称？", o:["长庆会盟","澶渊之盟","清水之盟"], a:0, n:"会盟碑今存拉萨大昭寺前。", s:"《旧唐书·吐蕃传》"},
+  {q:"“贞观之治”指的是哪位皇帝在位期间？", o:["唐高祖","唐太宗","唐玄宗"], a:1, n:"627—649 年，政治清明、国力恢复。", s:"《旧唐书·太宗本纪》"},
+
+  /* 谁更早 */
+  {q:"下面两件事，哪件发生得更早？", o:["玄武门之变","贞观之治开始"], a:0, n:"玄武门之变在 626 年，次年才改元贞观。", s:"《资治通鉴》"},
+  {q:"下面两件事，哪件发生得更早？", o:["安史之乱爆发","两税法推行"], a:0, n:"755 年 vs 780 年，中间隔了二十多年。", s:"《旧唐书·食货志》"},
+  {q:"下面两件事，哪件发生得更早？", o:["甘露之变","黄巢起义"], a:0, n:"835 年 vs 875 年，后者已是唐末。", s:"《资治通鉴》"},
+  {q:"下面两件事，哪件发生得更早？", o:["文成公主入藏","玄奘回到长安"], a:0, n:"641 年 vs 645 年。", s:"《旧唐书·吐蕃传》"},
+  {q:"下面两件事，哪件发生得更早？", o:["武则天称帝","神龙政变"], a:0, n:"690 年称帝，705 年被逼退位。", s:"《旧唐书·则天皇后本纪》"},
+  {q:"下面两件事，哪件发生得更早？", o:["怛罗斯之战","安史之乱爆发"], a:0, n:"751 年 vs 755 年，只差四年。", s:"《旧唐书·西戎传》"}
+];
+
+const EVENTS = [
+  {y:618, t:"李渊称帝，唐朝建立"},
+  {y:626, t:"玄武门之变"},
+  {y:627, t:"改元贞观"},
+  {y:641, t:"文成公主入藏"},
+  {y:645, t:"玄奘回到长安"},
+  {y:653, t:"颁行《唐律疏议》"},
+  {y:690, t:"武则天称帝，改国号为周"},
+  {y:705, t:"神龙政变，武则天退位"},
+  {y:713, t:"改元开元"},
+  {y:751, t:"怛罗斯之战"},
+  {y:755, t:"安史之乱爆发"},
+  {y:763, t:"安史之乱平定"},
+  {y:780, t:"推行两税法"},
+  {y:821, t:"唐蕃长庆会盟"},
+  {y:835, t:"甘露之变"},
+  {y:845, t:"会昌灭佛"},
+  {y:875, t:"黄巢起义爆发"},
+  {y:881, t:"黄巢攻入长安"},
+  {y:907, t:"朱温灭唐，建立后梁"}
+];
+
+const CATS = [
+  {c:"唐代著名诗人（写出 6 位以上）", a:["李白","杜甫","白居易","王维","李商隐","杜牧","韩愈","柳宗元","孟浩然","王昌龄","岑参","高适","刘禹锡","元稹","李贺","温庭筠","王之涣","崔颢"]},
+  {c:"安史之乱中的关键人物（写出 5 位以上）", a:["安禄山","史思明","郭子仪","李光弼","哥舒翰","封常清","高仙芝","张巡","许远","颜杲卿","安庆绪","史朝义"]},
+  {c:"唐朝皇帝（写出 6 位以上）", a:["李渊","李世民","李治","武则天","李显","李旦","李隆基","李亨","李豫","李适","李纯","李昂","李炎","李忱","李儇","李晔"]},
+  {c:"唐代佛教人物（写出 4 位以上）", a:["玄奘","鉴真","慧能","神秀","义净","一行","道宣","善导","不空"]},
+  {c:"中国史上以少胜多的战役（写出 5 个以上）", a:["巨鹿之战","昆阳之战","官渡之战","赤壁之战","淝水之战","鄱阳湖之战","萨尔浒之战","牧野之战"]},
+  {c:"唐代重要著作（写出 5 部以上）", a:["唐律疏议","大唐西域记","史通","通典","茶经","千金方","唐本草","大衍历"]},
+  {c:"唐代书法家（写出 4 位以上）", a:["颜真卿","柳公权","欧阳询","虞世南","褚遂良","张旭","怀素","李邕"]},
+  {c:"被后世冠以“某圣/某仙”的唐代人物（写出 4 位以上）", a:["李白（诗仙）","杜甫（诗圣）","王维（诗佛）","李贺（诗鬼）","吴道子（画圣）","张旭（草圣）","陆羽（茶圣）"]},
+  {c:"河朔三镇指哪三个藩镇？（写出 3 个）", a:["成德","魏博","卢龙"]}
+];
+
+/* ==================================================================
+   工具
+   ================================================================== */
+const $ = s => document.querySelector(s);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const norm = s => s.replace(/[\s，。、,.;；:：()（）·"“”'‘’]/g, "");
+
+let soundOn = true, ac = null;
+function beep(freq, dur, type, vol) {
+  if (!soundOn) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type || "sine"; o.frequency.value = freq;
+    g.gain.value = vol || 0.04;
+    o.connect(g); g.connect(ac.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + (dur || 0.08));
+    o.stop(ac.currentTime + (dur || 0.08) + 0.02);
+  } catch (e) {}
+}
+const sfxOk = () => { beep(660, .07, "triangle", .05); setTimeout(() => beep(990, .09, "triangle", .05), 70); };
+const sfxBad = () => { beep(180, .18, "sawtooth", .04); };
+const sfxTick = () => { beep(1200, .03, "square", .02); };
+
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $("#" + id).classList.add("active");
+}
+document.querySelectorAll("[data-go]").forEach(b => {
+  b.addEventListener("click", () => { stopAll(); show(b.dataset.go); });
+});
+
+let best = 0;
+try { best = parseInt(localStorage.getItem("tang_best") || "0", 10) || 0; } catch (e) {}
+function paintBest() { $("#bestWrap").textContent = "最高分 " + best; }
+paintBest();
+
+let timerId = null;
+function stopAll() { if (timerId) { clearInterval(timerId); timerId = null; } }
+function goResult(title, score, stats, review, again) {
+  stopAll();
+  $("#resTitle").textContent = title;
+  $("#resScore").textContent = score;
+  $("#resStats").innerHTML = stats.map(s => "<span>" + s + "</span>").join("");
+  const box = $("#resReview");
+  if (review.length) {
+    box.innerHTML = "<div class='rvlabel'>错题回顾</div>" + review.map(r =>
+      "<div class='rev-item'><div class='qq'>" + r.q + "</div><div class='aa'>✓ " + r.correct + "</div><span class='nn'>" + r.n +
+      (r.s ? " <span class='src'>" + r.s + "</span>" : "") + "</span></div>").join("");
+  } else {
+    box.innerHTML = "";
+  }
+  $("#again").onclick = again;
+  show("result");
+}
+
+/* ==================================================================
+   模式一：快问快答
+   ================================================================== */
+const QUES = { queue: [], i: 0, score: 0, combo: 0, right: 0, total: 0, wrong: [], locked: false, left: 60 };
+
+function startQuiz() {
+  stopAll();
+  QUES.queue = shuffle(QB);
+  QUES.i = 0; QUES.score = 0; QUES.combo = 0; QUES.right = 0; QUES.total = 0;
+  QUES.wrong = []; QUES.locked = false; QUES.left = 60;
+  $("#score").textContent = "0";
+  $("#combo").classList.remove("on");
+  show("quiz");
+  renderQ();
+  timerId = setInterval(() => {
+    QUES.left -= 0.1;
+    if (QUES.left <= 0) { QUES.left = 0; endQuiz(); return; }
+    $("#bar").style.width = (QUES.left / 60 * 100) + "%";
+    if (QUES.left <= 10 && Math.abs(QUES.left % 1) < 0.05) sfxTick();
+  }, 100);
+}
+
+function renderQ() {
+  const q = QUES.queue[QUES.i % QUES.queue.length];
+  QUES.cur = q;
+  $("#qText").textContent = q.q;
+  $("#fb").innerHTML = "";
+  $("#nextBtn").disabled = true;
+  $("#nextBtn").textContent = "下一题";
+  const box = $("#opts");
+  box.innerHTML = "";
+  q.o.forEach((text, idx) => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.innerHTML = "<span class='k'>" + (idx + 1) + "</span><span>" + text + "</span>";
+    b.onclick = () => answer(idx);
+    box.appendChild(b);
+  });
+  QUES.locked = false;
+}
+
+function answer(idx) {
+  if (QUES.locked) return;
+  QUES.locked = true;
+  const q = QUES.cur;
+  const btns = [...$("#opts").children];
+  btns.forEach(b => b.disabled = true);
+  btns[q.a].classList.add("ok");
+  QUES.total++;
+
+  if (idx === q.a) {
+    QUES.right++;
+    QUES.combo++;
+    const gain = 10 + Math.min(QUES.combo - 1, 5) * 2;
+    QUES.score += gain;
+    $("#score").textContent = QUES.score;
+    if (QUES.combo > 1) { $("#combo").textContent = "连击 ×" + QUES.combo + "  +" + gain; $("#combo").classList.add("on"); }
+    $("#fb").innerHTML = "<b>对。</b>" + q.n + " <span class='src'>" + q.s + "</span>";
+    sfxOk();
+  } else {
+    btns[idx].classList.add("bad");
+    QUES.combo = 0;
+    $("#combo").classList.remove("on");
+    QUES.wrong.push({ q: q.q, correct: q.o[q.a], n: q.n, s: q.s });
+    $("#fb").innerHTML = "<b>错。</b>正确答案是「" + q.o[q.a] + "」。" + q.n + " <span class='src'>" + q.s + "</span>";
+    sfxBad();
+  }
+  $("#nextBtn").disabled = false;
+  $("#nextBtn").textContent = idx === q.a ? "下一题 →" : "知道了，下一题";
+}
+
+function nextQ() {
+  if ($("#nextBtn").disabled) return;
+  QUES.i++;
+  if (QUES.left <= 0) { endQuiz(); return; }
+  renderQ();
+}
+
+function endQuiz() {
+  stopAll();
+  if (QUES.total === 0) { show("home"); return; }
+  const acc = Math.round(QUES.right / QUES.total * 100);
+  if (QUES.score > best) { best = QUES.score; try { localStorage.setItem("tang_best", String(best)); } catch (e) {} paintBest(); }
+  const stars = acc >= 90 ? "★★★" : acc >= 70 ? "★★" : acc >= 50 ? "★" : "—";
+  goResult("快问快答 · 本局结束", QUES.score,
+    ["答对 " + QUES.right + " / " + QUES.total, "正确率 " + acc + "%", "评级 " + stars],
+    QUES.wrong, startQuiz);
+}
+
+$("#nextBtn").addEventListener("click", nextQ);
+document.addEventListener("keydown", e => {
+  if ($("#quiz").classList.contains("active")) {
+    if (e.key >= "1" && e.key <= "3") {
+      const i = parseInt(e.key, 10) - 1;
+      const btns = [...$("#opts").children];
+      if (btns[i] && !btns[i].disabled) btns[i].click();
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault(); nextQ();
+    }
+  }
+  if (e.key === "Enter" && $("#assoc").classList.contains("active")) {
+    // 由输入框自己处理
+  }
+});
+
+/* ==================================================================
+   模式二：时间轴插卡
+   ================================================================== */
+const TL = { picked: [], placed: [], cur: null, lives: 3, locked: false };
+
+function startTimeline() {
+  stopAll();
+  const pool = shuffle(EVENTS).slice(0, 8);
+  TL.placed = pool.slice(0, 2).sort((a, b) => a.y - b.y);
+  TL.picked = pool.slice(2);
+  TL.lives = 3;
+  TL.locked = false;
+  $("#lives").textContent = "❤❤❤";
+  $("#tlHint").innerHTML = "";
+  show("timeline");
+  nextCard();
+}
+
+function nextCard() {
+  if (TL.picked.length === 0) { endTimeline(true); return; }
+  TL.cur = TL.picked.shift();
+  TL.locked = false;
+  $("#tlCard").textContent = TL.cur.t;
+  $("#tlHint").innerHTML = "";
+  paintRow();
+}
+
+function paintRow() {
+  const row = $("#tlRow");
+  row.innerHTML = "";
+  for (let i = 0; i <= TL.placed.length; i++) {
+    const s = document.createElement("button");
+    s.className = "slot";
+    s.textContent = "插在这里";
+    s.onclick = () => placeAt(i, s);
+    row.appendChild(s);
+    if (i < TL.placed.length) {
+      const c = document.createElement("div");
+      c.className = "tl-item";
+      c.innerHTML = "<span class='yy'>" + TL.placed[i].y + "</span><span>" + TL.placed[i].t + "</span>";
+      row.appendChild(c);
+    }
+  }
+}
+
+function placeAt(i, slotEl) {
+  if (TL.locked) return;
+  const y = TL.cur.y;
+  const leftOk = i === 0 || TL.placed[i - 1].y < y;
+  const rightOk = i === TL.placed.length || y < TL.placed[i].y;
+  if (leftOk && rightOk) {
+    TL.placed.splice(i, 0, TL.cur);
+    sfxOk();
+    $("#tlHint").innerHTML = "<b>对。</b>" + y + " 年，位置正好。";
+    TL.locked = true;
+    paintRow();
+    setTimeout(nextCard, 560);
+  } else {
+    TL.lives--;
+    $("#lives").textContent = "❤".repeat(Math.max(TL.lives, 0)) + "♡".repeat(Math.max(3 - TL.lives, 0));
+    slotEl.classList.add("wrongpick");
+    sfxBad();
+    let right = 0;
+    while (right < TL.placed.length && TL.placed[right].y < y) right++;
+    $("#tlHint").innerHTML = "<b>错。</b>它应该插在第 " + (right + 1) + " 个空位（" + y + " 年）。已帮你放进去了。";
+    TL.placed.splice(right, 0, TL.cur);
+    TL.locked = true;
+    paintRow();
+    if (TL.lives <= 0) { setTimeout(() => endTimeline(false), 900); return; }
+    setTimeout(() => nextCard(), 900);
+  }
+}
+
+function endTimeline(win) {
+  stopAll();
+  const n = TL.placed.length;
+  const score = Math.max(0, TL.lives) * 100 + n * 10;
+  const perfect = TL.lives === 3;
+  goResult(win ? (perfect ? "时间轴 · 全部插对！" : "时间轴 · 完成，但有失误") : "时间轴 · 命用完了", score,
+    ["插对 " + n + " 张", "剩余生命 " + Math.max(TL.lives, 0), perfect ? "零失误" : "有失误"],
+    [], startTimeline);
+}
+
+/* ==================================================================
+   模式三：联想发散
+   ================================================================== */
+const AS = { cat: null, left: 45, said: [], done: false };
+
+function startAssoc() {
+  stopAll();
+  AS.cat = CATS[Math.floor(Math.random() * CATS.length)];
+  AS.left = 45;
+  AS.said = [];
+  AS.done = false;
+  $("#asCat").innerHTML = "<b>" + AS.cat.c + "</b>";
+  $("#asTime").textContent = "45";
+  $("#asBar").style.width = "100%";
+  $("#asChips").innerHTML = "";
+  $("#asReveal").innerHTML = "";
+  $("#asFb").textContent = "想到就写，写错不扣分。回车提交。";
+  $("#asDone").style.display = "none";
+  const inp = $("#asInput");
+  inp.value = ""; inp.disabled = false; inp.focus();
+  show("assoc");
+  timerId = setInterval(() => {
+    AS.left -= 0.1;
+    $("#asTime").textContent = Math.max(0, Math.ceil(AS.left));
+    $("#asBar").style.width = (Math.max(0, AS.left) / 45 * 100) + "%";
+    if (AS.left <= 0) finishAssoc();
+  }, 100);
+}
+
+function addChip() {
+  if (AS.done) return;
+  const inp = $("#asInput");
+  const v = inp.value.trim();
+  if (!v) return;
+  if (!AS.said.some(x => norm(x) === norm(v))) {
+    AS.said.push(v);
+    const c = document.createElement("span");
+    c.className = "chip";
+    c.textContent = v;
+    $("#asChips").appendChild(c);
+    beep(880, .05, "sine", .03);
+  }
+  inp.value = "";
+}
+
+function finishAssoc() {
+  if (AS.done) return;
+  AS.done = true;
+  stopAll();
+  const inp = $("#asInput");
+  inp.disabled = true;
+
+  const used = new Set();
+  const rows = [];
+  let hit = 0;
+  AS.cat.a.forEach(ans => {
+    const foundIdx = AS.said.findIndex((s, i) => !used.has(i) && (norm(ans).indexOf(norm(s)) >= 0 || norm(s).indexOf(norm(ans)) >= 0));
+    if (foundIdx >= 0) { used.add(foundIdx); hit++; rows.push({ t: ans, ok: true }); }
+    else rows.push({ t: ans, ok: false });
+  });
+  AS.hit = hit;
+
+  $("#asReveal").innerHTML = "<div class='rvlabel'>参考答案 · 命中 " + hit + " / " + AS.cat.a.length + "</div>" +
+    rows.map(r => "<div class='rv " + (r.ok ? "hit" : "") + "'><span class='dot'></span><span>" + r.t + "</span></div>").join("");
+  $("#asFb").innerHTML = "你写了 <b>" + AS.said.length + "</b> 个，其中 <b>" + hit + "</b> 个在参考答案里。" +
+    (AS.said.length - hit > 0 ? " 另有 " + (AS.said.length - hit) + " 个不在列表里——如果它确实成立，说明你的知识面比这份清单更宽。" : "");
+  $("#asDone").style.display = "block";
+  beep(520, .12, "triangle", .05);
+  setTimeout(() => beep(700, .14, "triangle", .05), 120);
+}
+
+$("#asInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") { e.preventDefault(); addChip(); }
+});
+$("#asDone").addEventListener("click", () => {
+  const score = AS.hit * 10 + AS.said.length * 2;
+  goResult("联想发散 · " + AS.cat.c.replace(/（.*?）/g, ""), score,
+    ["命中 " + AS.hit + " / " + AS.cat.a.length, "共写 " + AS.said.length + " 个"],
+    [], startAssoc);
+});
+
+/* ==================================================================
+   入口
+   ================================================================== */
+document.querySelectorAll("[data-go]").forEach(b => {
+  b.addEventListener("click", () => {
+    const to = b.dataset.go;
+    if (to === "quiz") startQuiz();
+    else if (to === "timeline") startTimeline();
+    else if (to === "assoc") startAssoc();
+    else { stopAll(); }
+  });
+});
+$("#again").addEventListener("click", () => {});
+
+/* 深链接：#quiz / #timeline / #assoc 直接进对应关卡 */
+(function () {
+  const h = (location.hash || "").replace("#", "");
+  if (h === "quiz") startQuiz();
+  else if (h === "timeline") startTimeline();
+  else if (h === "assoc") startAssoc();
+})();
+</script>
+</body>
+</html>
