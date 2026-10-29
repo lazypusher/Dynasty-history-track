@@ -156,9 +156,99 @@ document.querySelector(".tlwrap").addEventListener("click", e => {
 });
 $("#jump").addEventListener("click", () => goChapter(0));
 
+/* 朝代纵览浮层（就地切换，不做页面跳转） */
+const OV_ERAS = [
+  ["先秦", ["xia", "shang", "zhou", "chunqiu", "zhanguo"]],
+  ["秦汉", ["qin", "han"]],
+  ["魏晋南北朝", ["sanguo", "jin"]],
+  ["隋唐", ["sui", "tang"]],
+  ["五代 · 宋辽金", ["wudai", "song", "liao", "jin2"]],
+  ["元明清", ["yuan", "ming", "qing"]]
+];
+const OV_HOOK = {
+  xia: "治水换来的王权", shang: "甲骨与青铜的王朝", zhou: "分封、宗法与礼乐",
+  chunqiu: "霸主代替天子", zhanguo: "变法竞赛，秦笑到最后", qin: "十五年改造天下",
+  han: "郡县与儒术的定型", sanguo: "三方立国，谁都没赢", jin: "门阀与皇权共治",
+  sui: "制度比武功更长久", tang: "从贞观到藩镇", wudai: "武人当国，南方积累",
+  song: "用制度换和平", liao: "草原与农耕的二元帝国", jin2: "从部落到中原王朝",
+  yuan: "行省、纸币与双轨治理", ming: "废相之后的皇权", qing: "最后一个王朝的收尾"
+};
+const OV_VAR = ["--c1", "--c2", "--c3", "--c4", "--c5", "--c6"];
+const ovEl = $("#ov");
+let ovBuilt = false;
+
+function buildOverview() {
+  const rows = [];
+  OV_ERAS.forEach(([name, ids], ei) => {
+    ids.forEach(id => {
+      const d = DY[id];
+      if (!d) return;
+      rows.push({
+        id, name: d.meta.name, years: d.meta.span, ei,
+        s: d.chapters[0].s, e: d.chapters[d.chapters.length - 1].e,
+        hook: OV_HOOK[id] || ""
+      });
+    });
+  });
+  const min = Math.min(...rows.map(r => r.s)), max = Math.max(...rows.map(r => r.e));
+  const total = max - min;
+
+  $("#ovRibbon").innerHTML = rows.map(r => {
+    const w = Math.max((r.e - r.s) / total * 100, 1.2);
+    return '<button class="ov-seg" data-id="' + r.id + '" title="' + r.name + " " + r.years + '"' +
+      ' style="width:' + w.toFixed(3) + "%;background:var(" + OV_VAR[r.ei] + ')">' +
+      (w >= 4 ? "<span>" + r.name + "</span>" : "") + "</button>";
+  }).join("");
+
+  const TICKS = [[-2070, "约前 2070"], [-1000, "前 1000"], [0, "元年"], [1000, "1000"], [1912, "1912"]];
+  $("#ovAxis").innerHTML = TICKS.map(t =>
+    '<span style="left:' + ((t[0] - min) / total * 100).toFixed(2) + '%">' + t[1] + "</span>").join("");
+  $("#ovLegend").innerHTML = OV_ERAS.map((e, i) =>
+    '<span><i style="background:var(' + OV_VAR[i] + ')"></i>' + e[0] + "</span>").join("");
+
+  $("#ovList").innerHTML = OV_ERAS.map(([name], ei) => {
+    const items = rows.filter(r => r.ei === ei);
+    if (!items.length) return "";
+    return '<section class="ov-era"><h3>' + name + "</h3>" + items.map(r =>
+      '<button class="ov-row' + (D && r.id === D.meta.id ? " cur" : "") + '" data-id="' + r.id + '">' +
+        '<span class="yr">' + r.years + "</span>" +
+        '<span class="nm"><span class="dot" style="background:var(' + OV_VAR[ei] + ')"></span>' + r.name + "</span>" +
+        '<span class="hk">' + r.hook + "</span>" +
+        '<span class="go">进入 →</span></button>').join("") + "</section>";
+  }).join("");
+
+  ovBuilt = true;
+}
+
+function openOverview() {
+  if (!ovBuilt) buildOverview();
+  else $("#ovList").querySelectorAll(".ov-row").forEach(b =>
+    b.classList.toggle("cur", D && b.dataset.id === D.meta.id));
+  ovEl.classList.add("on");
+  document.body.style.overflow = "hidden";
+}
+function closeOverview() {
+  ovEl.classList.remove("on");
+  document.body.style.overflow = "";
+}
+$("#homeBtn").onclick = openOverview;
+$("#ovClose").onclick = closeOverview;
+ovEl.addEventListener("click", e => {
+  if (e.target === ovEl) { closeOverview(); return; }
+  const b = e.target.closest(".ov-seg, .ov-row");
+  if (!b) return;
+  const id = b.dataset.id;
+  closeOverview();
+  switchTo(id);
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && ovEl.classList.contains("on")) closeOverview();
+});
+
 /* 切换朝代 */
 function switchTo(id) {
-  if (!DY[id] || (D && id === D.meta.id)) return;
+  if (!DY[id]) return;
+  if (D && id === D.meta.id) { closeOverview(); return; }
   closeLB(); closeModal();
   useDynasty(id);
   renderAll();

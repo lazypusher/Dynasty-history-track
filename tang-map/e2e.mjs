@@ -300,6 +300,25 @@ try {
   check("tang cards restored", await ev("document.querySelectorAll('.it').length") === 115,
         await ev("document.querySelectorAll('.it').length"));
 
+
+  /* ---- 纵览浮层（不跳转） ---- */
+  await ev("document.getElementById('homeBtn').click()");
+  await sleep(400);
+  check("overview opens", await ev("document.getElementById('ov').classList.contains('on')"));
+  check("overview lists 18 periods", await ev("document.querySelectorAll('.ov-row').length") === 18);
+  check("overview ribbon 18", await ev("document.querySelectorAll('.ov-seg').length") === 18);
+  check("overview keeps same url", (await ev("location.href")).indexOf("index.html") > 0 && (await ev("location.href")).indexOf("../") < 0);
+  await ev("(()=>{const b=[...document.querySelectorAll('.ov-row')].find(x=>x.dataset.id==='han'); b.click();})()");
+  await sleep(450);
+  check("overview switches dynasty", await ev("D.meta.id") === "han");
+  check("overview closes after pick", await ev("!document.getElementById('ov').classList.contains('on')"));
+  await ev("document.getElementById('homeBtn').click()");
+  await sleep(300);
+  check("current dynasty highlighted", await ev("document.querySelectorAll('.ov-row.cur').length") === 1);
+  await ev("(()=>{const b=[...document.querySelectorAll('.ov-row')].find(x=>x.dataset.id==='tang'); b.click();})()");
+  await sleep(450);
+  check("back to tang via overview", await ev("D.meta.id") === "tang");
+
   check("no page errors", errors.length === 0, errors);
 
   console.log("PASS " + ok.length);
