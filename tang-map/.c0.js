@@ -14,12 +14,16 @@ function useDynasty(id) {
   EMPS = D.emps; CH = D.chapters; QB = D.questions; EVENTS = D.events; CATS = D.cats;
   try { localStorage.setItem("dyn", D.meta.id); } catch (e) {}
   try {
-    const u = new URL(location.href);
-    u.searchParams.set("d", D.meta.id);
-    history.replaceState(null, "", u.href);
+    if (/[#&]d=/.test(location.hash || "")) {
+      history.replaceState(null, "", location.pathname + "#d=" + D.meta.id);
+    } else {
+      const u = new URL(location.href);
+      u.searchParams.set("d", D.meta.id);
+      history.replaceState(null, "", u.href);
+    }
   } catch (e) {}
 }
-const fy = y => (y < 0 ? "前" + (-y) : "" + y);
+const fy = y => (y < 0 ? (typeof D !== "undefined" && D.meta && D.meta.approx ? "约前" : "前") + (-y) : "" + y);
 const KIND = { emp:"皇位", pow:"权力", war:"战争", ppl:"人物", cul:"文化", rel:"文物" };
 const CN = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"];
 
@@ -167,8 +171,16 @@ $("#dynachips").addEventListener("click", e => {
 
 /* 首次渲染 */
 (function () {
-  let id = "tang";
-  try { id = new URLSearchParams(location.search).get("d") || localStorage.getItem("dyn") || "tang"; } catch (e) {}
+  let id = "";
+  try {
+    id = new URLSearchParams(location.search).get("d") || "";
+    if (!id) {
+      const m = (location.hash || "").match(/[#&]d=([^&]+)/);
+      if (m) id = decodeURIComponent(m[1]);
+    }
+    if (!id) id = localStorage.getItem("dyn") || "";
+  } catch (e) {}
+  if (!id) id = "tang";
   useDynasty(id);
   renderAll();
 })();
