@@ -47,7 +47,7 @@
   .nav button:hover{border-color:var(--gold);color:var(--gold)}
   .dynarow{max-width:1120px;margin:0 auto;padding:0 20px 7px;overflow-x:auto;overflow-y:hidden}
   .dynachips{display:flex;gap:5px;min-width:max-content;padding-bottom:1px}
-  .dynachip{font-family:inherit;font-size:12px;line-height:1.6;padding:2px 10px;border-radius:999px;
+  .dynachip{font-family:inherit;cursor:pointer;font-size:12px;line-height:1.6;padding:2px 10px;border-radius:999px;
     border:1px solid var(--line);background:#fff;color:var(--ink2);text-decoration:none;white-space:nowrap}
   .dynachip:hover{border-color:var(--gold);color:var(--gold)}
   .dynachip.on{background:var(--ink);border-color:var(--ink);color:#f6eee2}
@@ -484,11 +484,18 @@
 /* ---------- 闯关题库（由 tang-quiz 迁入） ---------- */
 /* 数据来自 data/*.js，按 ?d=朝代id 选择，默认唐 */
 const DY = window.DYNASTIES;
-let DID = "";
-try { DID = new URLSearchParams(location.search).get("d") || localStorage.getItem("dyn") || "tang"; } catch (e) { DID = "tang"; }
-const D = DY[DID] || DY.tang;
-const EMPS = D.emps, CH = D.chapters, QB = D.questions, EVENTS = D.events, CATS = D.cats;
-try { localStorage.setItem("dyn", D.meta.id); } catch (e) {}
+let D, EMPS, CH, QB, EVENTS, CATS, cur = 0, spy = null;
+
+function useDynasty(id) {
+  D = DY[id] || DY.tang;
+  EMPS = D.emps; CH = D.chapters; QB = D.questions; EVENTS = D.events; CATS = D.cats;
+  try { localStorage.setItem("dyn", D.meta.id); } catch (e) {}
+  try {
+    const u = new URL(location.href);
+    u.searchParams.set("d", D.meta.id);
+    history.replaceState(null, "", u.href);
+  } catch (e) {}
+}
 const fy = y => (y < 0 ? "前" + (-y) : "" + y);
 const KIND = { emp:"皇位", pow:"权力", war:"战争", ppl:"人物", cul:"文化", rel:"文物" };
 const CN = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"];
@@ -502,65 +509,81 @@ const CN = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
-/* 壳层：标题、选朝条、简介里的数字 */
-document.title = D.meta.title + " · 主线";
-$("#seal").textContent = D.meta.seal;
-$("#ttlMain").textContent = D.meta.title;
-$("#ttlSub").textContent = D.meta.span + " · " + D.meta.tagline;
-$("#introN").textContent = EMPS.length;
-$("#introC").textContent = CN[CH.length] || CH.length;
-$("#dynachips").innerHTML = (window.DYNASTY_LIST || []).map(d => {
-  if (!DY[d.id]) return '<span class="dynachip off" title="筹备中">' + d.name + "</span>";
-  return '<a class="dynachip' + (d.id === D.meta.id ? " on" : "") + '" href="?d=' + d.id + '" title="' + d.years + '">' + d.name + "</a>";
-}).join("");
+function renderAll() {
+  /* 壳层：标题、选朝条、简介里的数字 */
+  document.title = D.meta.title + " · 主线";
+  $("#seal").textContent = D.meta.seal;
+  $("#ttlMain").textContent = D.meta.title;
+  $("#ttlSub").textContent = D.meta.span + " · " + D.meta.tagline;
+  $("#introN").textContent = EMPS.length;
+  $("#introC").textContent = CN[CH.length] || CH.length;
+  $("#dynachips").innerHTML = (window.DYNASTY_LIST || []).map(d => {
+    if (!DY[d.id]) return '<span class="dynachip off" title="筹备中">' + d.name + "</span>";
+    return '<button class="dynachip' + (d.id === D.meta.id ? " on" : "") + '" data-id="' + d.id + '" title="' + d.years + '">' + d.name + "</button>";
+  }).join("");
 
-/* 顶部章节点 */
-$("#dots").innerHTML = CH.map((c, i) =>
-  `<button class="dot" data-i="${i}" title="${c.y} ${c.t}">${i + 1}</button>`).join("");
+  /* 顶部章节点 */
+  $("#dots").innerHTML = CH.map((c, i) =>
+    `<button class="dot" data-i="${i}" title="${c.y} ${c.t}">${i + 1}</button>`).join("");
 
-/* 皇位竖轴 */
-const abCount = EMPS.filter(e => e.ab).length;
-const peopleN = new Set(EMPS.map(e => e.n + (e.p || ""))).size;
-$("#rstat").innerHTML = peopleN + " 位君主 · " + EMPS.length + " 次即位 · 其中 <b>" + abCount + "</b> 次非正常（政变、拥立、自立、篡位、禅让）";
+  /* 皇位竖轴 */
+  const abCount = EMPS.filter(e => e.ab).length;
+  const peopleN = new Set(EMPS.map(e => e.n + (e.p || ""))).size;
+  $("#rstat").innerHTML = peopleN + " 位君主 · " + EMPS.length + " 次即位 · 其中 <b>" + abCount + "</b> 次非正常（政变、拥立、自立、篡位、禅让）";
 
-function empHTML(e, i) {
-  const tags = (e.tags || []).map(t => `<span class="tg">${t}</span>`).join("");
-  const al = e.al ? `<span class="al">${e.al}</span>` : "";
-  const cls = [i % 2 === 0 ? "L" : "R", e.k || "wen", e.ab ? "ab" : ""].join(" ");
-  return `<button class="tl-item ${cls}" data-i="${i}" data-y="${e.y0}"
-    title="${e.n}${e.p ? " " + e.p : ""} ${fy(e.y0)}–${fy(e.y1)}｜${e.m}">
-    <span class="tl-mid"><span class="tdot"></span></span>
-    <span class="tl-card">
-      <span class="row1"><span class="yr">${fy(e.y0)}–${fy(e.y1)}</span><span class="nm"><b>${e.n}</b><span class="pn">${e.p}</span>${al}</span></span>
-      <span class="tags">${tags}</span>
-    </span>
-  </button>`;
+  function empHTML(e, i) {
+    const tags = (e.tags || []).map(t => `<span class="tg">${t}</span>`).join("");
+    const al = e.al ? `<span class="al">${e.al}</span>` : "";
+    const cls = [i % 2 === 0 ? "L" : "R", e.k || "wen", e.ab ? "ab" : ""].join(" ");
+    return `<button class="tl-item ${cls}" data-i="${i}" data-y="${e.y0}"
+      title="${e.n}${e.p ? " " + e.p : ""} ${fy(e.y0)}–${fy(e.y1)}｜${e.m}">
+      <span class="tl-mid"><span class="tdot"></span></span>
+      <span class="tl-card">
+        <span class="row1"><span class="yr">${fy(e.y0)}–${fy(e.y1)}</span><span class="nm"><b>${e.n}</b><span class="pn">${e.p}</span>${al}</span></span>
+        <span class="tags">${tags}</span>
+      </span>
+    </button>`;
+  }
+  $("#tlwrap").innerHTML = EMPS.map((e, i) => empHTML(e, i)).join("");
+  $$(".ch").forEach((el) => el.remove());
+
+  /* 章节正文 */
+  $("#chapters").insertAdjacentHTML("beforeend", CH.map((c, ci) => {
+    const ruled = EMPS.filter(e => e.y0 <= c.e && e.y1 >= c.s);
+    const chips = ruled.map(e => `<span class="rchip">${e.n}${e.p ? " " + e.p : ""}</span>`).join("");
+    return `
+    <section class="ch" id="${c.id}" data-i="${ci}">
+      <div class="chhead"><span class="chy">${c.y}</span><span class="rulerow">${chips}</span><button class="quizchip" data-c="${c.id}">考这一章</button></div>
+      <h2 class="cht">${c.t}</h2>
+      <p class="chlead">${c.lead}</p>
+      <div class="grid">
+        ${c.items.map((it, j) => `
+          <button class="it k-${it.k}" data-c="${c.id}" data-j="${j}">
+            <span class="top"><span class="iy">${fy(it.y)}</span><span class="ik">${KIND[it.k]}</span></span>
+            <span class="it-t">${it.t}</span>
+            <span class="it-d">${it.d}</span>
+            ${it.mus ? '<span class="it-mus">' + it.mus + "</span>" : ""}
+          </button>`).join("")}
+      </div>
+      <div class="chain"><span class="cl">因果链</span>${
+        c.chain.map((n, i) => (i ? '<span class="ar">→</span>' : "") + `<span class="nd">${n}</span>`).join("")
+      }</div>
+    </section>`;
+  }).join(""));
+
+    cur = 0;
+    document.body.dataset.f = "";
+    $$(".fchip").forEach((c, i) => c.classList.toggle("on", i === 0));
+    if (spy) spy.disconnect();
+    spy = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting) { cur = +en.target.dataset.i; setActive(cur); }
+      });
+    }, { rootMargin: "-15% 0px -70% 0px", threshold: 0 });
+    $$(".ch").forEach(el => spy.observe(el));
+    setActive(0);
 }
-$("#tlwrap").innerHTML = EMPS.map((e, i) => empHTML(e, i)).join("");
 
-/* 章节正文 */
-$("#chapters").insertAdjacentHTML("beforeend", CH.map((c, ci) => {
-  const ruled = EMPS.filter(e => e.y0 <= c.e && e.y1 >= c.s);
-  const chips = ruled.map(e => `<span class="rchip">${e.n}${e.p ? " " + e.p : ""}</span>`).join("");
-  return `
-  <section class="ch" id="${c.id}" data-i="${ci}">
-    <div class="chhead"><span class="chy">${c.y}</span><span class="rulerow">${chips}</span><button class="quizchip" data-c="${c.id}">考这一章</button></div>
-    <h2 class="cht">${c.t}</h2>
-    <p class="chlead">${c.lead}</p>
-    <div class="grid">
-      ${c.items.map((it, j) => `
-        <button class="it k-${it.k}" data-c="${c.id}" data-j="${j}">
-          <span class="top"><span class="iy">${fy(it.y)}</span><span class="ik">${KIND[it.k]}</span></span>
-          <span class="it-t">${it.t}</span>
-          <span class="it-d">${it.d}</span>
-          ${it.mus ? '<span class="it-mus">' + it.mus + "</span>" : ""}
-        </button>`).join("")}
-    </div>
-    <div class="chain"><span class="cl">因果链</span>${
-      c.chain.map((n, i) => (i ? '<span class="ar">→</span>' : "") + `<span class="nd">${n}</span>`).join("")
-    }</div>
-  </section>`;
-}).join(""));
 
 /* ============================================================
    交互
@@ -599,15 +622,26 @@ document.querySelector(".tlwrap").addEventListener("click", e => {
 });
 $("#jump").addEventListener("click", () => goChapter(0));
 
-/* 滚动高亮 */
-let cur = 0;
-const spy = new IntersectionObserver(entries => {
-  entries.forEach(en => {
-    if (en.isIntersecting) { cur = +en.target.dataset.i; setActive(cur); }
-  });
-}, { rootMargin: "-15% 0px -70% 0px", threshold: 0 });
-$$(".ch").forEach(s => spy.observe(s));
-setActive(0);
+/* 切换朝代 */
+function switchTo(id) {
+  if (!DY[id] || (D && id === D.meta.id)) return;
+  closeLB(); closeModal();
+  useDynasty(id);
+  renderAll();
+  window.scrollTo({ top: 0, behavior: "auto" });
+}
+$("#dynachips").addEventListener("click", e => {
+  const b = e.target.closest("button.dynachip");
+  if (b) switchTo(b.dataset.id);
+});
+
+/* 首次渲染 */
+(function () {
+  let id = "tang";
+  try { id = new URLSearchParams(location.search).get("d") || localStorage.getItem("dyn") || "tang"; } catch (e) {}
+  useDynasty(id);
+  renderAll();
+})();
 
 
 /* ---------- 文物大图 ---------- */

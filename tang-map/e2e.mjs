@@ -272,6 +272,34 @@ try {
   await ev("document.getElementById('sheetClose').click()");
   await sleep(150);
 
+
+  /* ---- 朝代切换（就地重渲染，不跳转） ---- */
+  const clickDyn = n => "(()=>{const b=[...document.querySelectorAll('button.dynachip')].find(x=>x.textContent==='" + n + "'); if(b) b.click(); return !!b;})()";
+  check("han chip exists", await ev(clickDyn("汉")) === true);
+  await sleep(450);
+  check("switched to han", await ev("D.meta.id") === "han");
+  check("han chapters re-rendered", await ev("document.querySelectorAll('section.ch').length") === 6,
+        await ev("document.querySelectorAll('section.ch').length"));
+  check("han cards re-rendered", await ev("document.querySelectorAll('.it').length") === 63,
+        await ev("document.querySelectorAll('.it').length"));
+  check("han stat updated", (await ev("document.getElementById('rstat').textContent")).includes("22"),
+        await ev("document.getElementById('rstat').textContent"));
+  check("active chip is han", (await ev("[...document.querySelectorAll('.dynachip.on')].map(x=>x.textContent).join()")) === "汉");
+  check("han title", (await ev("document.title")).indexOf("汉朝") === 0, await ev("document.title"));
+  check("stale sections removed", await ev("document.querySelectorAll('section.ch').length") === 6);
+
+  await ev("document.querySelector('.quizchip').click()");
+  await sleep(300);
+  check("quiz still works after switch", await ev("document.getElementById('v-quiz').classList.contains('on')"));
+  await ev("document.getElementById('sheetClose').click()");
+  await sleep(200);
+
+  await ev(clickDyn("唐"));
+  await sleep(450);
+  check("switched back to tang", await ev("D.meta.id") === "tang");
+  check("tang cards restored", await ev("document.querySelectorAll('.it').length") === 115,
+        await ev("document.querySelectorAll('.it').length"));
+
   check("no page errors", errors.length === 0, errors);
 
   console.log("PASS " + ok.length);
