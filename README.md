@@ -1,7 +1,9 @@
 # 中国朝代史 · 可视化学习站
 
 按中国王朝更替的顺序，**每个朝代一页**：皇位更替时间轴、主线章节、人物与文物卡片、闯关练习。
-纯静态、零依赖，双击 `tang-map/index.html` 就能用。
+纯静态、零依赖，双击根目录的 `index.html` 先看纵览，点任意一朝进入。
+
+**首页 `index.html`** 是一条按年数等比的长卷：色块的长度就是该朝代的年数（夏 470 年、秦 15 年），下面按「先秦 / 秦汉 / 魏晋南北朝 / 隋唐 / 五代宋辽金 / 元明清」六段列出十八个时期，点哪一条进哪一页。
 
 目前已建成 **18 个时期，从夏到清全部完成**——朝代条上不再有「筹备中」的占位。
 
@@ -70,7 +72,7 @@ git clone git@github.com:lazypusher/Dynasty-history-track.git
 cd Dynasty-history-track
 ```
 
-双击 `tang-map/index.html`（默认打开唐），或直接指定朝代：
+双击根目录 `index.html` 看纵览；也可以直接打开某一朝（默认唐）：
 
 ```
 tang-map/index.html?d=qin
@@ -85,6 +87,7 @@ tang-map/index.html?d=qing
 
 ```
 .
+├── index.html                  # 首页：朝代纵览（等比长卷 + 分组列表）
 ├── 中国朝代史自学手册.md        # 六周自学方案、卡片模板、可信度纪律
 ├── tang-map/
 │   ├── index.html              # 壳层：渲染引擎 + 选朝条
