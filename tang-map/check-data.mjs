@@ -28,6 +28,12 @@ for (const [id, d] of Object.entries(dyns)) {
     if (!Array.isArray(d[k]) || !d[k].length) say(id, k + " 缺失或为空");
   }
 
+  // 数组空洞（逗号漏写会生成 elision，界面会少一张卡）
+  d.chapters.forEach(c => {
+    if (c.items.some((x, i) => !(i in c.items) || !x || !x.t)) say(id, c.id + " items 有空位或空项");
+  });
+  d.questions.forEach((q, i) => { if (!(i in d.questions) || !q || !q.q) say(id, "questions 有空位"); });
+
   // 章节
   d.chapters.forEach((c, i) => {
     if (i && c.s <= d.chapters[i - 1].s) say(id, c.id + " 起始年未递增");
