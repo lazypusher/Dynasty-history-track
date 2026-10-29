@@ -12,7 +12,9 @@ window.DYNASTIES = window.DYNASTIES || {};
 window.DYNASTY_LIST = [
   { id: "xia",   name: "夏",   years: "约前2070—前1600" },
   { id: "shang", name: "商",   years: "约前1600—前1046" },
-  { id: "zhou",  name: "周",   years: "前1046—前256" },
+  { id: "zhou",  name: "西周", years: "前1046—前771" },
+  { id: "chunqiu", name: "春秋", years: "前770—前476" },
+  { id: "zhanguo", name: "战国", years: "前475—前221" },
   { id: "qin",   name: "秦",   years: "前221—前206" },
   { id: "han",   name: "汉",   years: "前202—220" },
   { id: "sanguo",name: "三国", years: "220—280" },

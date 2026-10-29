@@ -95,6 +95,8 @@
   .tl-item .nm{display:inline-flex;align-items:baseline;gap:5px;font-size:15px;letter-spacing:.5px;color:var(--ink)}
   .tl-item .nm b{font-weight:600}
   .tl-item .nm .pn{font-size:13px;color:var(--ink2);letter-spacing:1px}
+  .tl-item .rg{font-size:10px;color:#7a6a58;border:1px solid var(--line);background:#fff;
+    border-radius:3px;padding:0 4px;margin-left:5px;letter-spacing:.5px;vertical-align:1px}
   .tl-item .al{
     font-size:10.5px;color:#8a5c33;border:1px solid #dcc3a4;background:#fdf6ec;
     border-radius:4px;padding:0 5px;letter-spacing:.5px;white-space:nowrap;
@@ -472,10 +474,17 @@
 </div>
 
 <script src="data/dynasties.js"></script>
+<script src="data/chunqiu.js"></script>
+<script src="data/zhanguo.js"></script>
 <script src="data/qin.js"></script>
 <script src="data/han.js"></script>
 <script src="data/sui.js"></script>
+<script src="data/sanguo.js"></script>
+<script src="data/jin.js"></script>
 <script src="data/song.js"></script>
+<script src="data/wudai.js"></script>
+<script src="data/liao.js"></script>
+<script src="data/jin2.js"></script>
 <script src="data/ming.js"></script>
 <script src="data/yuan.js"></script>
 <script src="data/qing.js"></script>
@@ -538,12 +547,13 @@ function renderAll() {
   function empHTML(e, i) {
     const tags = (e.tags || []).map(t => `<span class="tg">${t}</span>`).join("");
     const al = e.al ? `<span class="al">${e.al}</span>` : "";
+  const rg = e.regime ? `<span class="rg">${e.regime}</span>` : "";
     const cls = [i % 2 === 0 ? "L" : "R", e.k || "wen", e.ab ? "ab" : ""].join(" ");
     return `<button class="tl-item ${cls}" data-i="${i}" data-y="${e.y0}"
       title="${e.n}${e.p ? " " + e.p : ""} ${fy(e.y0)}–${fy(e.y1)}｜${e.m}">
       <span class="tl-mid"><span class="tdot"></span></span>
       <span class="tl-card">
-        <span class="row1"><span class="yr">${fy(e.y0)}–${fy(e.y1)}</span><span class="nm"><b>${e.n}</b><span class="pn">${e.p}</span>${al}</span></span>
+        <span class="row1"><span class="yr">${fy(e.y0)}–${fy(e.y1)}</span><span class="nm"><b>${e.n}</b><span class="pn">${e.p}</span>${rg}${al}</span></span>
         <span class="tags">${tags}</span>
       </span>
     </button>`;
