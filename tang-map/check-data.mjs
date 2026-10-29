@@ -30,9 +30,13 @@ for (const [id, d] of Object.entries(dyns)) {
 
   // 数组空洞（逗号漏写会生成 elision，界面会少一张卡）
   d.chapters.forEach(c => {
-    if (c.items.some((x, i) => !(i in c.items) || !x || !x.t)) say(id, c.id + " items 有空位或空项");
+    for (let i = 0; i < c.items.length; i++) {
+      if (!(i in c.items) || !c.items[i] || !c.items[i].t) say(id, c.id + " items 第 " + i + " 项为空位");
+    }
   });
-  d.questions.forEach((q, i) => { if (!(i in d.questions) || !q || !q.q) say(id, "questions 有空位"); });
+  for (let i = 0; i < d.questions.length; i++) {
+    if (!(i in d.questions) || !d.questions[i] || !d.questions[i].q) say(id, "questions 第 " + i + " 项为空位");
+  }
 
   // 章节
   d.chapters.forEach((c, i) => {
