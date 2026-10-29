@@ -39,7 +39,11 @@ function renderAll() {
   $("#ttlMain").textContent = D.meta.title;
   $("#ttlSub").textContent = D.meta.span + " · " + D.meta.tagline;
   $("#introN").textContent = EMPS.length;
+  $("#introA").textContent = D.meta.ascend || "即位";
   $("#introC").textContent = CN[CH.length] || CH.length;
+  $("#secTitle").textContent = D.meta.rulerLabel || "皇位更替";
+  $("#tlegend").style.display = D.meta.noAbnormal ? "none" : "";
+  $("#jump").textContent = "↓ 跳到" + (CN[CH.length] || CH.length) + "章主线";
   $("#dynachips").innerHTML = (window.DYNASTY_LIST || []).map(d => {
     if (!DY[d.id]) return '<span class="dynachip off" title="筹备中">' + d.name + "</span>";
     return '<button class="dynachip' + (d.id === D.meta.id ? " on" : "") + '" data-id="' + d.id + '" title="' + d.years + '">' + d.name + "</button>";
@@ -52,7 +56,9 @@ function renderAll() {
   /* 皇位竖轴 */
   const abCount = EMPS.filter(e => e.ab).length;
   const peopleN = new Set(EMPS.map(e => e.n + (e.p || ""))).size;
-  $("#rstat").innerHTML = peopleN + " 位君主 · " + EMPS.length + " 次即位 · 其中 <b>" + abCount + "</b> 次非正常（政变、拥立、自立、篡位、禅让）";
+  $("#rstat").innerHTML = D.meta.noAbnormal
+  ? peopleN + " 位" + (D.meta.unit || "君主") + " · " + EMPS.length + " 次" + (D.meta.ascend || "即位")
+  : peopleN + " 位" + (D.meta.unit || "君主") + " · " + EMPS.length + " 次" + (D.meta.ascend || "即位") + " · 其中 <b>" + abCount + "</b> 次非正常（政变、拥立、自立、篡位、禅让）";
 
   function empHTML(e, i) {
     const tags = (e.tags || []).map(t => `<span class="tg">${t}</span>`).join("");

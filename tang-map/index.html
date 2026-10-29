@@ -364,12 +364,12 @@
 <div class="wrap">
   <section class="succ">
     <div class="sechead">
-      <h2>皇位更替</h2>
+      <h2 id="secTitle">皇位更替</h2>
       <span class="hint">点任意一位，跳到对应章节</span>
     </div>
     <div class="secstat" id="rstat"></div>
     <div class="tlwrap" id="tlwrap"></div>
-    <div class="tlegend">
+    <div class="tlegend" id="tlegend">
       <span><i style="background:#f0f6f2;border-color:#8cb3a3"></i>治世</span>
       <span><i style="background:#faf5ec"></i>平稳</span>
       <span><i style="background:#fbf0ed;border-color:#cb9086"></i>乱局</span>
@@ -380,8 +380,8 @@
 
   <main id="chapters">
     <div class="intro">
-      <p>上面竖着的是 <b><span id="introN">23</span> 次即位</b>：在位年份、庙号、姓名、别称，以及最多三条治世评价或大事；下面是 <b><span id="introC">八</span> 章主线</b>，每章末尾有一条因果链。</p>
-      <p>点轴上的皇帝跳到对应章节，点任意卡片看细节和同期的其他人，按 <kbd>←</kbd> <kbd>→</kbd> 翻章。</p>
+      <p>上面竖着的是 <b><span id="introN">23</span> 次<span id="introA">即位</span></b>：年份、称号、姓名、别称，以及最多三条关键词；下面是 <b><span id="introC">八</span> 章主线</b>，每章末尾有一条因果链。</p>
+      <p>点轴上的条目跳到对应章节，点任意卡片看细节和同期的其他人，按 <kbd>←</kbd> <kbd>→</kbd> 翻章。</p>
     </div>
     <div class="filters" id="filters">
       <button class="fchip on" data-f="">全部</button>
@@ -529,7 +529,11 @@ function renderAll() {
   $("#ttlMain").textContent = D.meta.title;
   $("#ttlSub").textContent = D.meta.span + " · " + D.meta.tagline;
   $("#introN").textContent = EMPS.length;
+  $("#introA").textContent = D.meta.ascend || "即位";
   $("#introC").textContent = CN[CH.length] || CH.length;
+  $("#secTitle").textContent = D.meta.rulerLabel || "皇位更替";
+  $("#tlegend").style.display = D.meta.noAbnormal ? "none" : "";
+  $("#jump").textContent = "↓ 跳到" + (CN[CH.length] || CH.length) + "章主线";
   $("#dynachips").innerHTML = (window.DYNASTY_LIST || []).map(d => {
     if (!DY[d.id]) return '<span class="dynachip off" title="筹备中">' + d.name + "</span>";
     return '<button class="dynachip' + (d.id === D.meta.id ? " on" : "") + '" data-id="' + d.id + '" title="' + d.years + '">' + d.name + "</button>";
@@ -542,7 +546,9 @@ function renderAll() {
   /* 皇位竖轴 */
   const abCount = EMPS.filter(e => e.ab).length;
   const peopleN = new Set(EMPS.map(e => e.n + (e.p || ""))).size;
-  $("#rstat").innerHTML = peopleN + " 位君主 · " + EMPS.length + " 次即位 · 其中 <b>" + abCount + "</b> 次非正常（政变、拥立、自立、篡位、禅让）";
+  $("#rstat").innerHTML = D.meta.noAbnormal
+  ? peopleN + " 位" + (D.meta.unit || "君主") + " · " + EMPS.length + " 次" + (D.meta.ascend || "即位")
+  : peopleN + " 位" + (D.meta.unit || "君主") + " · " + EMPS.length + " 次" + (D.meta.ascend || "即位") + " · 其中 <b>" + abCount + "</b> 次非正常（政变、拥立、自立、篡位、禅让）";
 
   function empHTML(e, i) {
     const tags = (e.tags || []).map(t => `<span class="tg">${t}</span>`).join("");
