@@ -7,7 +7,8 @@
 /* ---------- 闯关题库（由 tang-quiz 迁入） ---------- */
 /* 数据来自 data/*.js，按 ?d=朝代id 选择，默认唐 */
 const DY = window.DYNASTIES;
-let D, EMPS, CH, QB, EVENTS, CATS, cur = 0, spy = null;
+let D, EMPS, CH, QB, EVENTS, CATS, cur = 0, spy = null, spy2 = null;
+const MOTION = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function useDynasty(id) {
   D = DY[id] || DY.tang;
@@ -69,7 +70,7 @@ function renderAll() {
     const al = e.al ? `<span class="al">${e.al}</span>` : "";
   const rg = e.regime ? `<span class="rg">${e.regime}</span>` : "";
     const cls = [i % 2 === 0 ? "L" : "R", e.k || "wen", e.ab ? "ab" : ""].join(" ");
-    return `<button class="tl-item ${cls}" data-i="${i}" data-y="${e.y0}"
+    return `<button class="tl-item ${cls}" data-i="${i}" data-y="${e.y0}" style="--i:${i}"
       title="${e.n}${e.p ? " " + e.p : ""} ${fy(e.y0)}–${fy(e.y1)}｜${e.m}">
       <span class="tl-mid"><span class="tdot"></span></span>
       <span class="tl-card">
@@ -92,7 +93,7 @@ function renderAll() {
       <p class="chlead">${c.lead}</p>
       <div class="grid">
         ${c.items.map((it, j) => `
-          <button class="it k-${it.k}" data-c="${c.id}" data-j="${j}">
+          <button class="it k-${it.k}" data-c="${c.id}" data-j="${j}" style="--j:${j}">
             <span class="top"><span class="iy">${fy(it.y)}</span><span class="ik">${KIND[it.k]}</span></span>
             <span class="it-t">${it.t}</span>
             <span class="it-d">${it.d}</span>
@@ -115,6 +116,25 @@ function renderAll() {
       });
     }, { rootMargin: "-15% 0px -70% 0px", threshold: 0 });
     $$(".ch").forEach(el => spy.observe(el));
+
+    /* 卷轴展开：竖轴重绘、印章重落、章节卡滚动浮现 */
+    if (MOTION) {
+      const wrap = $(".tlwrap");
+      wrap.classList.remove("draw");
+      void wrap.offsetWidth;
+      wrap.classList.add("draw");
+      const seal = $("#seal");
+      seal.classList.remove("stamp");
+      void seal.offsetWidth;
+      seal.classList.add("stamp");
+      if (spy2) spy2.disconnect();
+      spy2 = new IntersectionObserver(es => es.forEach(en => {
+        if (en.isIntersecting) { en.target.classList.add("in"); spy2.unobserve(en.target); }
+      }), { rootMargin: "-2% 0px -8% 0px", threshold: 0 });
+      $$(".ch").forEach(el => spy2.observe(el));
+      const first = $(".ch");
+      if (first) first.classList.add("in");
+    }
     setActive(0);
 }
 
@@ -196,7 +216,7 @@ function buildOverview() {
   $("#ovRibbon").innerHTML = rows.map(r => {
     const w = Math.max((r.e - r.s) / total * 100, 1.2);
     return '<button class="ov-seg" data-id="' + r.id + '" title="' + r.name + " " + r.years + '"' +
-      ' style="width:' + w.toFixed(3) + "%;background:var(" + OV_VAR[r.ei] + ')">' +
+      ' data-ei="' + r.ei + '" style="--i:' + rows.indexOf(r) + ";width:" + w.toFixed(3) + "%;background:var(" + OV_VAR[r.ei] + ')">' +
       (w >= 4 ? "<span>" + r.name + "</span>" : "") + "</button>";
   }).join("");
 
@@ -210,7 +230,7 @@ function buildOverview() {
     const items = rows.filter(r => r.ei === ei);
     if (!items.length) return "";
     return '<section class="ov-era"><h3>' + name + "</h3>" + items.map(r =>
-      '<button class="ov-row' + (D && r.id === D.meta.id ? " cur" : "") + '" data-id="' + r.id + '">' +
+      '<button class="ov-row' + (D && r.id === D.meta.id ? " cur" : "") + '" data-id="' + r.id + '" style="--i:' + rows.indexOf(r) + '">' +
         '<span class="yr">' + r.years + "</span>" +
         '<span class="nm"><span class="dot" style="background:var(' + OV_VAR[ei] + ')"></span>' + r.name + "</span>" +
         '<span class="hk">' + r.hook + "</span>" +
@@ -249,6 +269,16 @@ document.addEventListener("keydown", e => {
 function switchTo(id) {
   if (!DY[id]) return;
   if (D && id === D.meta.id) { closeOverview(); return; }
+  if (MOTION) {
+    const sw = $(".sweep");
+    if (sw) { sw.classList.remove("on"); void sw.offsetWidth; sw.classList.add("on"); }
+    const tn = $("#turn");
+    if (tn) {
+      $("#turnName").textContent = DY[id].meta.name;
+      $("#turnSub").textContent = DY[id].meta.span;
+      tn.classList.remove("on"); void tn.offsetWidth; tn.classList.add("on");
+    }
+  }
   closeLB(); closeModal();
   useDynasty(id);
   renderAll();
@@ -271,6 +301,12 @@ $("#dynachips").addEventListener("click", e => {
     if (!id) id = localStorage.getItem("dyn") || "";
   } catch (e) {}
   if (!id) id = "tang";
+  if (MOTION) {
+    const sw = document.createElement("div");
+    sw.className = "sweep";
+    document.body.appendChild(sw);
+    document.body.classList.add("motion");
+  }
   useDynasty(id);
   renderAll();
 })();

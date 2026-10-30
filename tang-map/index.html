@@ -384,6 +384,64 @@
   .rn{color:var(--ink2);font-size:11.5px}
   @media (max-width:560px){ .playbtn{padding:6px 10px} .sheet-in{margin:8px auto;padding:12px 13px 16px} }
   @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} .modal{animation:none} }
+
+  /* ============ 动效：卷轴展开 / 王朝更迭 ============ */
+  @media (prefers-reduced-motion: no-preference){
+    @keyframes riseIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+    @keyframes stampIn{0%{opacity:0;transform:scale(1.55) rotate(-7deg)}
+      55%{opacity:1;transform:scale(.94) rotate(1.5deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+    @keyframes drawLine{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+    @keyframes dotPulse{0%,100%{box-shadow:0 0 0 0 rgba(178,58,46,.34)}
+      55%{box-shadow:0 0 0 7px rgba(178,58,46,0)}}
+    @keyframes sweepX{0%{transform:translateX(-35%) skewX(-11deg);opacity:0}
+      18%{opacity:1}100%{transform:translateX(135%) skewX(-11deg);opacity:0}}
+    @keyframes growX{from{transform:scaleX(0);opacity:.4}to{transform:scaleX(1);opacity:1}}
+    @keyframes popIn{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+
+    /* 竖轴自上而下绘出 */
+    .tlwrap.draw::before{animation:drawLine .95s cubic-bezier(.22,.72,.2,1) both;transform-origin:center top}
+    /* 君主卡依次落入 */
+    .tl-item{animation:riseIn .5s cubic-bezier(.22,.72,.2,1) backwards;
+      animation-delay:calc(min(var(--i,0), 22) * 26ms)}
+    /* 非正常继位的红点，缓慢搏动 */
+    .tl-item.ab .tdot{animation:dotPulse 2.8s ease-in-out infinite}
+    .tl-item.ab:nth-child(n+1) .tdot{animation-delay:calc(var(--i,0) * 120ms)}
+    /* 印章落下 */
+    #seal.stamp{animation:stampIn .62s cubic-bezier(.2,1.18,.36,1) both}
+
+    /* 换朝时的一行题字 */
+    @keyframes turnIn{0%{opacity:0;transform:scale(1.05)}16%{opacity:1;transform:scale(1)}
+      72%{opacity:1}100%{opacity:0;transform:scale(.99)}}
+    .turn{position:fixed;inset:0;z-index:67;display:grid;place-items:center;pointer-events:none;opacity:0}
+    .turn.on{animation:turnIn .9s cubic-bezier(.3,.7,.3,1) both}
+    .turn .box{text-align:center;padding:20px 54px 18px;border-radius:16px;
+      background:rgba(250,246,238,.95);
+      box-shadow:0 14px 44px rgba(90,60,30,.10),0 0 0 1px rgba(217,202,181,.55)}
+    .turn .tn{display:block;font-size:38px;line-height:1.2;letter-spacing:10px;text-indent:10px;color:#241d19}
+    .turn .ts{display:block;margin-top:8px;font-size:11px;letter-spacing:3px;color:#8a7358;white-space:nowrap}
+    /* 换朝时的一道墨扫 */
+    .sweep{position:fixed;inset:-12% -25%;z-index:66;pointer-events:none;opacity:0;
+      background:linear-gradient(100deg,transparent 0%,rgba(178,58,46,.03) 34%,
+        rgba(120,95,65,.085) 50%,rgba(178,58,46,.03) 66%,transparent 100%)}
+    .sweep.on{animation:sweepX .8s cubic-bezier(.3,.6,.3,1) both}
+
+    /* 章节卡片：滚动进入视口时逐张浮现 */
+    body.motion .ch.in .it{animation:riseIn .5s cubic-bezier(.22,.72,.2,1) backwards;
+      animation-delay:calc(min(var(--j,0), 10) * 42ms)}
+    body.motion .ch.in .chain{animation:riseIn .5s ease backwards;animation-delay:.34s}
+
+    /* 详情弹层 */
+    .modal.on .modal-card{animation:popIn .26s cubic-bezier(.22,.72,.2,1) both}
+    /* 纵览长卷逐段生长 */
+    .ov.on .ov-seg{animation:growX .5s cubic-bezier(.22,.72,.2,1) both;
+      transform-origin:left center;animation-delay:calc(min(var(--i,0),20) * 16ms)}
+    .ov.on .ov-axis span{animation:riseIn .42s ease both;animation-delay:.34s}
+    .ov.on .ov-row{animation:riseIn .42s ease both;animation-delay:calc(.1s + min(var(--i,0),20) * 14ms)}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ch .it{opacity:1!important;transform:none!important}
+    .sweep{display:none}
+  }
 </style>
 </head>
 <body>
@@ -436,6 +494,8 @@
     </div>
   </main>
 </div>
+
+<div class="turn" id="turn"><div class="box"><span class="tn" id="turnName"></span><span class="ts" id="turnSub"></span></div></div>
 
 <div class="ov" id="ov">
   <div class="ov-in">
@@ -556,7 +616,8 @@
 /* ---------- 闯关题库（由 tang-quiz 迁入） ---------- */
 /* 数据来自 data/*.js，按 ?d=朝代id 选择，默认唐 */
 const DY = window.DYNASTIES;
-let D, EMPS, CH, QB, EVENTS, CATS, cur = 0, spy = null;
+let D, EMPS, CH, QB, EVENTS, CATS, cur = 0, spy = null, spy2 = null;
+const MOTION = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function useDynasty(id) {
   D = DY[id] || DY.tang;
@@ -618,7 +679,7 @@ function renderAll() {
     const al = e.al ? `<span class="al">${e.al}</span>` : "";
   const rg = e.regime ? `<span class="rg">${e.regime}</span>` : "";
     const cls = [i % 2 === 0 ? "L" : "R", e.k || "wen", e.ab ? "ab" : ""].join(" ");
-    return `<button class="tl-item ${cls}" data-i="${i}" data-y="${e.y0}"
+    return `<button class="tl-item ${cls}" data-i="${i}" data-y="${e.y0}" style="--i:${i}"
       title="${e.n}${e.p ? " " + e.p : ""} ${fy(e.y0)}–${fy(e.y1)}｜${e.m}">
       <span class="tl-mid"><span class="tdot"></span></span>
       <span class="tl-card">
@@ -641,7 +702,7 @@ function renderAll() {
       <p class="chlead">${c.lead}</p>
       <div class="grid">
         ${c.items.map((it, j) => `
-          <button class="it k-${it.k}" data-c="${c.id}" data-j="${j}">
+          <button class="it k-${it.k}" data-c="${c.id}" data-j="${j}" style="--j:${j}">
             <span class="top"><span class="iy">${fy(it.y)}</span><span class="ik">${KIND[it.k]}</span></span>
             <span class="it-t">${it.t}</span>
             <span class="it-d">${it.d}</span>
@@ -664,6 +725,25 @@ function renderAll() {
       });
     }, { rootMargin: "-15% 0px -70% 0px", threshold: 0 });
     $$(".ch").forEach(el => spy.observe(el));
+
+    /* 卷轴展开：竖轴重绘、印章重落、章节卡滚动浮现 */
+    if (MOTION) {
+      const wrap = $(".tlwrap");
+      wrap.classList.remove("draw");
+      void wrap.offsetWidth;
+      wrap.classList.add("draw");
+      const seal = $("#seal");
+      seal.classList.remove("stamp");
+      void seal.offsetWidth;
+      seal.classList.add("stamp");
+      if (spy2) spy2.disconnect();
+      spy2 = new IntersectionObserver(es => es.forEach(en => {
+        if (en.isIntersecting) { en.target.classList.add("in"); spy2.unobserve(en.target); }
+      }), { rootMargin: "-2% 0px -8% 0px", threshold: 0 });
+      $$(".ch").forEach(el => spy2.observe(el));
+      const first = $(".ch");
+      if (first) first.classList.add("in");
+    }
     setActive(0);
 }
 
@@ -745,7 +825,7 @@ function buildOverview() {
   $("#ovRibbon").innerHTML = rows.map(r => {
     const w = Math.max((r.e - r.s) / total * 100, 1.2);
     return '<button class="ov-seg" data-id="' + r.id + '" title="' + r.name + " " + r.years + '"' +
-      ' style="width:' + w.toFixed(3) + "%;background:var(" + OV_VAR[r.ei] + ')">' +
+      ' data-ei="' + r.ei + '" style="--i:' + rows.indexOf(r) + ";width:" + w.toFixed(3) + "%;background:var(" + OV_VAR[r.ei] + ')">' +
       (w >= 4 ? "<span>" + r.name + "</span>" : "") + "</button>";
   }).join("");
 
@@ -759,7 +839,7 @@ function buildOverview() {
     const items = rows.filter(r => r.ei === ei);
     if (!items.length) return "";
     return '<section class="ov-era"><h3>' + name + "</h3>" + items.map(r =>
-      '<button class="ov-row' + (D && r.id === D.meta.id ? " cur" : "") + '" data-id="' + r.id + '">' +
+      '<button class="ov-row' + (D && r.id === D.meta.id ? " cur" : "") + '" data-id="' + r.id + '" style="--i:' + rows.indexOf(r) + '">' +
         '<span class="yr">' + r.years + "</span>" +
         '<span class="nm"><span class="dot" style="background:var(' + OV_VAR[ei] + ')"></span>' + r.name + "</span>" +
         '<span class="hk">' + r.hook + "</span>" +
@@ -798,6 +878,16 @@ document.addEventListener("keydown", e => {
 function switchTo(id) {
   if (!DY[id]) return;
   if (D && id === D.meta.id) { closeOverview(); return; }
+  if (MOTION) {
+    const sw = $(".sweep");
+    if (sw) { sw.classList.remove("on"); void sw.offsetWidth; sw.classList.add("on"); }
+    const tn = $("#turn");
+    if (tn) {
+      $("#turnName").textContent = DY[id].meta.name;
+      $("#turnSub").textContent = DY[id].meta.span;
+      tn.classList.remove("on"); void tn.offsetWidth; tn.classList.add("on");
+    }
+  }
   closeLB(); closeModal();
   useDynasty(id);
   renderAll();
@@ -820,6 +910,12 @@ $("#dynachips").addEventListener("click", e => {
     if (!id) id = localStorage.getItem("dyn") || "";
   } catch (e) {}
   if (!id) id = "tang";
+  if (MOTION) {
+    const sw = document.createElement("div");
+    sw.className = "sweep";
+    document.body.appendChild(sw);
+    document.body.classList.add("motion");
+  }
   useDynasty(id);
   renderAll();
 })();
