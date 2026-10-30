@@ -135,13 +135,12 @@
   }
   .fchip:hover{border-color:var(--gold);color:var(--gold)}
   .fchip.on{background:var(--ink);border-color:var(--ink);color:#f6eee2}
-  body[data-f]:not([data-f=""]) .it{opacity:.18;filter:grayscale(.7);transition:opacity .2s}
-  body[data-f="emp"] .it.k-emp,
-  body[data-f="pow"] .it.k-pow,
-  body[data-f="war"] .it.k-war,
-  body[data-f="ppl"] .it.k-ppl,
-  body[data-f="cul"] .it.k-cul,
-  body[data-f="rel"] .it.k-rel{opacity:1;filter:none}
+  .it{transition:opacity .2s,filter .2s}
+  .it.dim{opacity:.16;filter:grayscale(.75)}
+  .tfilters{margin-top:8px;align-items:center}
+  .tfilters .flabel{font-size:11.5px;color:#a58e71;letter-spacing:2px;margin-right:4px}
+  .tfilters .fchip.t-on{background:var(--gold);border-color:var(--gold);color:#fff}
+  .fchip .fnum{font-size:9.5px;opacity:.55;margin-left:3px;vertical-align:1px}
   .ch{padding:8px 0 30px;scroll-margin-top:104px;border-bottom:1px dashed var(--line)}
   .ch:last-child{border-bottom:none}
   .chhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -423,6 +422,19 @@
     .th-y{min-width:52px}
   }
 
+  .rail{position:fixed;right:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;
+    gap:13px;z-index:40}
+  .rail button{position:relative;display:flex;align-items:center;justify-content:flex-end;
+    background:none;border:none;padding:2px 0;cursor:pointer;font-family:inherit}
+  .rail i{display:block;width:13px;height:2px;background:#cebca4;border-radius:2px;transition:.18s}
+  .rail button:hover i{width:22px;background:var(--gold)}
+  .rail button.on i{width:26px;height:3px;background:var(--red)}
+  .rail .rl{position:absolute;right:34px;white-space:nowrap;font-size:11px;color:var(--ink2);
+    background:#fff;border:1px solid var(--line);border-radius:4px;padding:1px 8px;opacity:0;
+    pointer-events:none;transition:.15s}
+  .rail button:hover .rl{opacity:1}
+  @media (max-width:1100px){.rail{display:none}}
+
   /* ============ 动效：卷轴展开 / 王朝更迭 ============ */
   @media (prefers-reduced-motion: no-preference){
     @keyframes riseIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -517,6 +529,8 @@
     <button class="jump" id="jump">↓ 跳到八章主线</button>
   </section>
 
+  <nav class="rail" id="rail" aria-label="章节刻度"></nav>
+
   <main id="chapters">
     <div class="intro">
       <p>上面竖着的是 <b><span id="introN">23</span> 次<span id="introA">即位</span></b>：年份、称号、姓名、别称，以及最多三条关键词；下面是 <b><span id="introC">八</span> 章主线</b>，每章末尾有一条因果链。</p>
@@ -531,6 +545,7 @@
       <button class="fchip" data-f="cul">文化</button>
       <button class="fchip" data-f="rel">文物</button>
     </div>
+    <div class="filters tfilters" id="tfilters"></div>
   </main>
 </div>
 
@@ -719,6 +734,9 @@ function renderAll() {
   /* 顶部章节点 */
   $("#dots").innerHTML = CH.map((c, i) =>
     `<button class="dot" data-i="${i}" title="${c.y} ${c.t}">${i + 1}</button>`).join("");
+  /* 右侧章节刻度 */
+  $("#rail").innerHTML = CH.map((c, i) =>
+    `<button data-i="${i}" title="${c.y} ${c.t}"><span class="rl">${c.y} ${c.t}</span><i></i></button>`).join("");
 
   /* 皇位竖轴 */
   const abCount = EMPS.filter(e => e.ab).length;
@@ -755,7 +773,7 @@ function renderAll() {
       <p class="chlead">${c.lead}</p>
       <div class="grid">
         ${c.items.map((it, j) => `
-          <button class="it k-${it.k}" data-c="${c.id}" data-j="${j}" style="--j:${j}">
+          <button class="it k-${it.k}${(it.th || []).map(t => " t-" + t).join("")}" data-c="${c.id}" data-j="${j}" style="--j:${j}">
             <span class="top"><span class="iy">${fy(it.y)}</span><span class="ik">${KIND[it.k]}</span></span>
             <span class="it-t">${it.t}</span>
             <span class="it-d">${it.d}</span>
@@ -770,7 +788,18 @@ function renderAll() {
 
     cur = 0;
     document.body.dataset.f = "";
-    $$(".fchip").forEach((c, i) => c.classList.toggle("on", i === 0));
+    $$("#filters .fchip").forEach((c, i) => c.classList.toggle("on", i === 0));
+    document.body.dataset.f = "";
+    document.body.dataset.t = "";
+    const TH_LABEL = { reform: "变法", build: "建设", exam: "选官", treaty: "和议", coin: "币制" };
+    const counts = {};
+    CH.forEach(c => c.items.forEach(it => (it.th || []).forEach(t => { counts[t] = (counts[t] || 0) + 1; })));
+    const chips = Object.keys(TH_LABEL).filter(k => counts[k]).map(k =>
+      '<button class="fchip" data-t="' + k + '">' + TH_LABEL[k] + '<span class="fnum">' + counts[k] + "</span></button>");
+    $("#tfilters").innerHTML = chips.length
+      ? '<span class="flabel">主题</span>' + chips.join("")
+      : "";
+    applyFilter();
     if (spy) spy.disconnect();
     spy = new IntersectionObserver(entries => {
       entries.forEach(en => {
@@ -816,19 +845,42 @@ function goChapter(i) {
 }
 function setActive(i) {
   $$(".dot").forEach((d, k) => d.classList.toggle("on", k === i));
+  $$("#rail button").forEach((d, k) => d.classList.toggle("on", k === i));
 }
 
 $("#dots").addEventListener("click", e => {
   const b = e.target.closest(".dot");
   if (b) goChapter(+b.dataset.i);
 });
+$("#rail").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (b) goChapter(+b.dataset.i);
+});
 
-/* 类别筛选 */
+/* 类别 + 主题筛选 */
+function applyFilter() {
+  const f = document.body.dataset.f || "";
+  const t = document.body.dataset.t || "";
+  $$(".it").forEach(el => {
+    const okF = !f || el.classList.contains("k-" + f);
+    const okT = !t || el.classList.contains("t-" + t);
+    el.classList.toggle("dim", !(okF && okT));
+  });
+}
 $("#filters").addEventListener("click", e => {
   const b = e.target.closest(".fchip");
   if (!b) return;
-  $$(".fchip").forEach(c => c.classList.toggle("on", c === b));
+  $$("#filters .fchip").forEach(c => c.classList.toggle("on", c === b));
   document.body.dataset.f = b.dataset.f;
+  applyFilter();
+});
+$("#tfilters").addEventListener("click", e => {
+  const b = e.target.closest(".fchip");
+  if (!b) return;
+  const on = document.body.dataset.t === b.dataset.t;
+  document.body.dataset.t = on ? "" : b.dataset.t;
+  $$("#tfilters .fchip").forEach(c => c.classList.toggle("on", !on && c === b));
+  applyFilter();
 });
 $("#prev").onclick = () => goChapter(cur - 1);
 $("#next").onclick = () => goChapter(cur + 1);

@@ -8,13 +8,13 @@ def parse():
         json_len=struct.unpack('<I',d[12:16])[0]
         f.seek(16); hdr=f.read(json_len)
         return json.loads(hdr.decode('utf-8')), 8+header_size
-def get(root):
+def get(rootpath):
     h,base=parse()
-    node=h['files']
-    for part in root.strip('/').split('/'):
-        if not part: continue
-        node=node['files'][part]
-    return node, base
+    node = h['files'] if 'files' not in h['files'] else h['files']
+    cur = {'files': h['files']}
+    for part in [p for p in rootpath.strip('/').split('/') if p]:
+        cur = cur['files'][part]
+    return cur, base
 def extract(rootpath):
     node,base=get(rootpath)
     p=os.path.join(OUT, rootpath.strip('/').replace('/', os.sep))
@@ -22,8 +22,10 @@ def extract(rootpath):
         os.makedirs(p, exist_ok=True)
         for name in node['files']:
             extract(rootpath.rstrip('/')+'/'+name)
+    elif node.get('link'):
+        print('LINK', rootpath, '->', node['link'])
     else:
-        os.makedirs(os.path.dirname(p), exist_ok=True)
+        os.makedirs(os.path.dirname(p) or '.', exist_ok=True)
         off = base + int(node['offset'])
         with open(ASAR,'rb') as f:
             f.seek(off); data=f.read(node['size'])
