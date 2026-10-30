@@ -109,7 +109,7 @@ try {
   await sleep(200);
   check("sheet opens", await ev("document.getElementById('sheet').classList.contains('on')"));
   check("menu visible", await ev("document.getElementById('v-menu').classList.contains('on')"));
-  check("three game cards", await ev("document.querySelectorAll('#v-menu .gcard').length") === 3);
+  check("four game cards", await ev("document.querySelectorAll('#v-menu .gcard').length") === 4);
   check("chapter quiz chips", await ev("document.querySelectorAll('.quizchip').length") === 8);
 
   /* ---- 快问快答（全局） ---- */
@@ -318,6 +318,46 @@ try {
   await ev("(()=>{const b=[...document.querySelectorAll('.ov-row')].find(x=>x.dataset.id==='tang'); b.click();})()");
   await sleep(450);
   check("back to tang via overview", await ev("D.meta.id") === "tang");
+
+
+  /* ---- 主题纵览 ---- */
+  await ev("document.getElementById('themeBtn').click()");
+  await sleep(400);
+  check("theme overlay opens", await ev("document.getElementById('th').classList.contains('on')"));
+  check("theme tabs = 5", await ev("document.querySelectorAll('.th-tab').length") === 5);
+  check("theme nodes rendered", await ev("document.querySelectorAll('.th-node').length") >= 6);
+  await ev("(()=>{const t=[...document.querySelectorAll('.th-tab')].find(x=>x.textContent==='运河'); t.click();})()");
+  await sleep(250);
+  check("theme tab switches", (await ev("document.querySelector('.th-node .th-t').textContent")).indexOf("邗沟") >= 0 ||
+    (await ev("document.querySelectorAll('.th-node').length")) === 8);
+  await ev("(()=>{const n=[...document.querySelectorAll('.th-node')].find(x=>x.dataset.d==='qin'); n.click();})()");
+  await sleep(900);
+  check("theme node jumps", await ev("D.meta.id") === "qin");
+  check("theme overlay closed", await ev("!document.getElementById('th').classList.contains('on')"));
+  await ev("(()=>{const b=[...document.querySelectorAll('.dynachip')].find(x=>x.textContent==='唐'); b.click();})()");
+  await sleep(500);
+  check("back to tang after theme", await ev("D.meta.id") === "tang");
+
+  /* ---- 通史卷 ---- */
+  await ev("document.getElementById('playBtn').click()");
+  await sleep(250);
+  check("quiz menu has 4 modes", await ev("document.querySelectorAll('.gcard').length") === 4);
+  await ev("(()=>{const b=[...document.querySelectorAll('.gcard')].find(x=>x.dataset.g==='all'); b.click();})()");
+  await sleep(400);
+  check("crossover starts", (await ev("document.getElementById('qLabel').textContent")).indexOf("通史卷") === 0);
+  check("crossover has 12 questions", (await ev("document.getElementById('qProg').textContent")) === "1 / 12");
+  await ev("document.querySelector('#qOpts .qopt').click()");
+  await sleep(200);
+  check("crossover shows dynasty tag", await ev("!!document.querySelector('#qFb .qdyn')"));
+  for (let k = 0; k < 14; k++) {
+    if (await ev("document.getElementById('v-res').classList.contains('on')")) break;
+    await ev("(()=>{const b=document.querySelector('#qOpts .qopt'); if(b) b.click();})()");
+    await sleep(80);
+    await ev("(()=>{const b=document.getElementById('qNext'); if(b && !b.disabled) b.click();})()");
+    await sleep(80);
+  }
+  await sleep(250);
+  check("crossover result titled 通史卷", (await ev("document.getElementById('resTitle').textContent")).indexOf("通史卷") === 0);
 
   check("no page errors", errors.length === 0, errors);
 

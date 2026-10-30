@@ -265,6 +265,58 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape" && ovEl.classList.contains("on")) closeOverview();
 });
 
+/* 主题纵览 */
+let thCur = 0;
+function renderTheme(i) {
+  thCur = i;
+  const T = (window.THEMES || [])[i];
+  if (!T) return;
+  $("#thTabs").innerHTML = (window.THEMES || []).map((t, k) =>
+    '<button class="th-tab' + (k === i ? " on" : "") + '" data-k="' + k + '">' + t.name + "</button>").join("");
+  $("#thBody").innerHTML =
+    '<div class="th-head"><span class="th-name">' + T.name + '</span>' +
+      '<span class="th-sub">' + T.sub + "</span>" +
+      '<p class="th-lead">' + T.lead + "</p></div>" +
+    '<div class="th-list">' + T.nodes.map(n => {
+      const jump = n.d && DY[n.d];
+      return '<button class="th-node' + (jump ? "" : " gap") + '"' +
+        (jump ? ' data-d="' + n.d + '" data-y="' + n.y + '"' : "") + ' title="' +
+        (jump ? "跳到" + DY[n.d].meta.name + "对应章节" : "该政权暂无独立页面") + '">' +
+        '<span class="th-r1"><span class="th-y">' + fy(n.y) + "</span>" +
+        '<span class="th-dyn">' + n.dn + "</span>" +
+        '<span class="th-t">' + n.t + "</span></span>" +
+        '<span class="th-v">' + n.d2 + "</span></button>";
+    }).join("") + "</div>" +
+    '<div class="th-tail">' + T.tail + "</div>";
+}
+function openThemes() {
+  if (!window.THEMES || !window.THEMES.length) return;
+  renderTheme(thCur);
+  $("#th").classList.add("on");
+  document.body.style.overflow = "hidden";
+}
+function closeThemes() {
+  $("#th").classList.remove("on");
+  document.body.style.overflow = "";
+}
+$("#themeBtn").onclick = openThemes;
+$("#thClose").onclick = closeThemes;
+$("#th").addEventListener("click", e => {
+  if (e.target === $("#th")) { closeThemes(); return; }
+  const tab = e.target.closest(".th-tab");
+  if (tab) { renderTheme(+tab.dataset.k); return; }
+  const node = e.target.closest(".th-node");
+  if (!node || !node.dataset.d) return;
+  const id = node.dataset.d, y = +node.dataset.y;
+  closeThemes();
+  if (D && D.meta.id === id) { setTimeout(() => goChapter(chapterIndexOf(y)), 60); return; }
+  switchTo(id);
+  setTimeout(() => goChapter(chapterIndexOf(y)), 90);
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && $("#th").classList.contains("on")) closeThemes();
+});
+
 /* 切换朝代 */
 function switchTo(id) {
   if (!DY[id]) return;

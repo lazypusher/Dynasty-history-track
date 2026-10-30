@@ -1,0 +1,27 @@
+{
+  "name": "@deepseek-ai/dsh-desktop",
+  "description": "Electron desktop shell for a bundled dsh runtime and external plugins",
+  "version": "0.2.1-rc.3",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/main.js",
+  "dependencies": {
+    "electron-updater": "^6.8.9",
+    "semver": "^7.8.5",
+    "ws": "^8.21.3",
+    "@deepseek-ai/dsh-api-gateway": "workspace:*",
+    "@deepseek-ai/cordis": "workspace:~"
+  },
+  "dshDesktopAppId": "com.deepseek.dsh",
+  "dshDesktopUpdateChannel": "nightly",
+  "dshMandatoryUpdatePolicy": {
+    "origin": "https://harness.deepseek.com",
+    "allowedPageOrigins": [
+      "https://harness.deepseek.com"
+    ],
+    "authentication": "anonymous"
+  },
+  "dshBuildCommit": "be72761ee1a6736ebcdf4f3739363b083ae53c98",
+  "dshBuildDirty": false
+}
