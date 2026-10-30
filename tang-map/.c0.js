@@ -57,6 +57,9 @@ function renderAll() {
   /* 顶部章节点 */
   $("#dots").innerHTML = CH.map((c, i) =>
     `<button class="dot" data-i="${i}" title="${c.y} ${c.t}">${i + 1}</button>`).join("");
+  /* 右侧章节刻度 */
+  $("#rail").innerHTML = CH.map((c, i) =>
+    `<button data-i="${i}" title="${c.y} ${c.t}"><span class="rl">${c.y} ${c.t}</span><i></i></button>`).join("");
 
   /* 皇位竖轴 */
   const abCount = EMPS.filter(e => e.ab).length;
@@ -93,7 +96,7 @@ function renderAll() {
       <p class="chlead">${c.lead}</p>
       <div class="grid">
         ${c.items.map((it, j) => `
-          <button class="it k-${it.k}" data-c="${c.id}" data-j="${j}" style="--j:${j}">
+          <button class="it k-${it.k}${(it.th || []).map(t => " t-" + t).join("")}" data-c="${c.id}" data-j="${j}" style="--j:${j}">
             <span class="top"><span class="iy">${fy(it.y)}</span><span class="ik">${KIND[it.k]}</span></span>
             <span class="it-t">${it.t}</span>
             <span class="it-d">${it.d}</span>
@@ -108,7 +111,18 @@ function renderAll() {
 
     cur = 0;
     document.body.dataset.f = "";
-    $$(".fchip").forEach((c, i) => c.classList.toggle("on", i === 0));
+    $$("#filters .fchip").forEach((c, i) => c.classList.toggle("on", i === 0));
+    document.body.dataset.f = "";
+    document.body.dataset.t = "";
+    const TH_LABEL = { reform: "变法", build: "建设", exam: "选官", treaty: "和议", coin: "币制" };
+    const counts = {};
+    CH.forEach(c => c.items.forEach(it => (it.th || []).forEach(t => { counts[t] = (counts[t] || 0) + 1; })));
+    const chips = Object.keys(TH_LABEL).filter(k => counts[k]).map(k =>
+      '<button class="fchip" data-t="' + k + '">' + TH_LABEL[k] + '<span class="fnum">' + counts[k] + "</span></button>");
+    $("#tfilters").innerHTML = chips.length
+      ? '<span class="flabel">主题</span>' + chips.join("")
+      : "";
+    applyFilter();
     if (spy) spy.disconnect();
     spy = new IntersectionObserver(entries => {
       entries.forEach(en => {
@@ -154,19 +168,42 @@ function goChapter(i) {
 }
 function setActive(i) {
   $$(".dot").forEach((d, k) => d.classList.toggle("on", k === i));
+  $$("#rail button").forEach((d, k) => d.classList.toggle("on", k === i));
 }
 
 $("#dots").addEventListener("click", e => {
   const b = e.target.closest(".dot");
   if (b) goChapter(+b.dataset.i);
 });
+$("#rail").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (b) goChapter(+b.dataset.i);
+});
 
-/* 类别筛选 */
+/* 类别 + 主题筛选 */
+function applyFilter() {
+  const f = document.body.dataset.f || "";
+  const t = document.body.dataset.t || "";
+  $$(".it").forEach(el => {
+    const okF = !f || el.classList.contains("k-" + f);
+    const okT = !t || el.classList.contains("t-" + t);
+    el.classList.toggle("dim", !(okF && okT));
+  });
+}
 $("#filters").addEventListener("click", e => {
   const b = e.target.closest(".fchip");
   if (!b) return;
-  $$(".fchip").forEach(c => c.classList.toggle("on", c === b));
+  $$("#filters .fchip").forEach(c => c.classList.toggle("on", c === b));
   document.body.dataset.f = b.dataset.f;
+  applyFilter();
+});
+$("#tfilters").addEventListener("click", e => {
+  const b = e.target.closest(".fchip");
+  if (!b) return;
+  const on = document.body.dataset.t === b.dataset.t;
+  document.body.dataset.t = on ? "" : b.dataset.t;
+  $$("#tfilters .fchip").forEach(c => c.classList.toggle("on", !on && c === b));
+  applyFilter();
 });
 $("#prev").onclick = () => goChapter(cur - 1);
 $("#next").onclick = () => goChapter(cur + 1);

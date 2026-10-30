@@ -326,10 +326,9 @@ try {
   check("theme overlay opens", await ev("document.getElementById('th').classList.contains('on')"));
   check("theme tabs = 5", await ev("document.querySelectorAll('.th-tab').length") === 5);
   check("theme nodes rendered", await ev("document.querySelectorAll('.th-node').length") >= 6);
-  await ev("(()=>{const t=[...document.querySelectorAll('.th-tab')].find(x=>x.textContent==='运河'); t.click();})()");
+  await ev("(()=>{const t=[...document.querySelectorAll('.th-tab')].find(x=>x.textContent==='建设'); t.click();})()");
   await sleep(250);
-  check("theme tab switches", (await ev("document.querySelector('.th-node .th-t').textContent")).indexOf("邗沟") >= 0 ||
-    (await ev("document.querySelectorAll('.th-node').length")) === 8);
+  check("theme tab switches", (await ev("document.querySelector('.th-node .th-t').textContent")).indexOf("邗沟") >= 0);
   await ev("(()=>{const n=[...document.querySelectorAll('.th-node')].find(x=>x.dataset.d==='qin'); n.click();})()");
   await sleep(900);
   check("theme node jumps", await ev("D.meta.id") === "qin");
@@ -358,6 +357,31 @@ try {
   }
   await sleep(250);
   check("crossover result titled 通史卷", (await ev("document.getElementById('resTitle').textContent")).indexOf("通史卷") === 0);
+
+
+  /* ---- 右侧章节刻度 ---- */
+  check("rail ticks = chapters", await ev("document.querySelectorAll('#rail button').length") === 8);
+  await ev("document.querySelectorAll('#rail button')[5].click()");
+  await sleep(1400);
+  check("rail click scrolls to chapter", await ev("Math.abs(document.getElementById('c6').getBoundingClientRect().top) < 260"));
+  check("rail click marks active", await ev("document.querySelectorAll('#rail button.on').length") === 1);
+  await ev("window.scrollTo(0,0)");
+  await sleep(500);
+
+  /* ---- 本朝主题筛选 ---- */
+  await ev("(()=>{const b=[...document.querySelectorAll('.dynachip')].find(x=>x.textContent==='隋'); b.click();})()");
+  await sleep(600);
+  check("theme chips rendered", await ev("document.querySelectorAll('#tfilters .fchip').length") >= 2);
+  check("build theme chip exists", (await ev("[...document.querySelectorAll('#tfilters .fchip')].map(c=>c.textContent).join('|')")).indexOf("建设") >= 0);
+  await ev("(()=>{const b=[...document.querySelectorAll('#tfilters .fchip')].find(x=>x.textContent.indexOf('建设')===0); b.click();})()");
+  await sleep(300);
+  check("theme filter dims others", await ev("document.querySelectorAll('.it.dim').length") > 0);
+  check("theme filter keeps build cards", await ev("[...document.querySelectorAll('.it.t-build')].every(e=>!e.classList.contains('dim'))"));
+  await ev("(()=>{const b=[...document.querySelectorAll('#tfilters .fchip')].find(x=>x.textContent.indexOf('建设')===0); b.click();})()");
+  await sleep(250);
+  check("theme filter resets", await ev("document.querySelectorAll('.it.dim').length") === 0);
+  await ev("(()=>{const b=[...document.querySelectorAll('.dynachip')].find(x=>x.textContent==='唐'); b.click();})()");
+  await sleep(600);
 
   check("no page errors", errors.length === 0, errors);
 
