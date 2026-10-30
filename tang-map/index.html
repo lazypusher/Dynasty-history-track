@@ -348,6 +348,11 @@
   .qopt[disabled]{cursor:default}
   .qfb{margin-top:11px;font-size:12.5px;line-height:1.65;color:var(--ink2);min-height:18px}
   .qfb b{color:var(--ink)}
+  .qdyn{display:inline-block;margin-left:6px;font-size:10.5px;color:#7a6a58;border:1px solid var(--line);
+    background:#fff;border-radius:3px;padding:0 5px;vertical-align:1px}
+  .rgo{margin-top:7px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 12px;
+    font-size:11.5px;color:var(--ink2);cursor:pointer;font-family:inherit}
+  .rgo:hover{border-color:var(--gold);color:var(--gold)}
   .qsrc{font-size:10.5px;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:0 6px;margin-left:4px;white-space:nowrap}
   .qnext{width:100%;margin-top:11px;padding:10px;border-radius:10px;border:none;background:var(--ink);
     color:#f7efe3;font-family:inherit;font-size:14px;letter-spacing:2px;cursor:pointer}
@@ -384,6 +389,39 @@
   .rn{color:var(--ink2);font-size:11.5px}
   @media (max-width:560px){ .playbtn{padding:6px 10px} .sheet-in{margin:8px auto;padding:12px 13px 16px} }
   @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} .modal{animation:none} }
+
+
+  /* ---------- 主题纵览 ---------- */
+  .th-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 18px}
+  .th-tab{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 16px;
+    font-size:13px;letter-spacing:2px;color:var(--ink2);cursor:pointer;font-family:inherit;transition:.14s}
+  .th-tab:hover{border-color:var(--gold);color:var(--gold)}
+  .th-tab.on{background:var(--red);border-color:var(--red);color:#fff}
+  .th-head{margin-bottom:16px}
+  .th-name{font-size:22px;letter-spacing:4px}
+  .th-sub{font-size:12.5px;color:var(--gold);letter-spacing:1px;margin-left:10px}
+  .th-lead{font-size:13px;color:var(--ink2);line-height:1.85;margin:8px 0 0;max-width:62ch}
+  .th-list{position:relative;padding-left:26px;margin:18px 0 6px}
+  .th-list::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .th-node{position:relative;display:block;width:100%;text-align:left;background:none;border:1px solid transparent;
+    border-radius:10px;padding:10px 12px 10px 14px;margin-bottom:2px;cursor:pointer;font-family:inherit;color:inherit;transition:.13s}
+  .th-node:hover{background:#fff;border-color:var(--gold)}
+  .th-node::before{content:"";position:absolute;left:-24px;top:19px;width:9px;height:9px;border-radius:50%;
+    background:#fff;border:2px solid #bda183;box-sizing:border-box}
+  .th-node:hover::before{border-color:var(--red);background:var(--red)}
+  .th-node.gap::before{border-color:var(--red);background:var(--red)}
+  .th-r1{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+  .th-y{font-size:11.5px;color:#a9834a;font-variant-numeric:tabular-nums;min-width:64px}
+  .th-dyn{font-size:10.5px;color:#7a6a58;border:1px solid var(--line);background:#fff;border-radius:3px;padding:0 5px}
+  .th-t{font-size:15px;letter-spacing:.5px}
+  .th-v{font-size:12.5px;color:var(--ink2);line-height:1.7;margin:5px 0 0 73px}
+  .th-tail{margin-top:18px;padding:12px 14px;border-left:3px solid var(--gold);background:#fff;
+    font-size:12.5px;color:var(--ink2);line-height:1.8;border-radius:0 8px 8px 0}
+  .th-empty{font-size:13px;color:var(--ink2);padding:24px 0}
+  @media (max-width:640px){
+    .th-v{margin-left:0}
+    .th-y{min-width:52px}
+  }
 
   /* ============ 动效：卷轴展开 / 王朝更迭 ============ */
   @media (prefers-reduced-motion: no-preference){
@@ -455,6 +493,7 @@
       <button id="prev" title="上一章">‹</button>
       <button id="next" title="下一章">›</button>
     </div>
+    <button class="homebtn" id="themeBtn" title="主题纵览">主题</button>
     <button class="homebtn" id="homeBtn" title="朝代纵览">纵览</button>
     <button class="playbtn" id="playBtn">闯关</button>
   </div>
@@ -497,6 +536,18 @@
 
 <div class="turn" id="turn"><div class="box"><span class="tn" id="turnName"></span><span class="ts" id="turnSub"></span></div></div>
 
+<div class="ov" id="th">
+  <div class="ov-in">
+    <div class="ov-top">
+      <span class="ov-title">主题纵览</span>
+      <button class="ov-close" id="thClose">×</button>
+    </div>
+    <div class="ov-sub">换一条线看历史：不是「一朝之内」，而是「同一件事，几百年里被反复处理」。</div>
+    <div class="th-tabs" id="thTabs"></div>
+    <div id="thBody"></div>
+  </div>
+</div>
+
 <div class="ov" id="ov">
   <div class="ov-in">
     <div class="ov-top">
@@ -524,6 +575,7 @@
         <button class="gcard" data-g="quiz"><span class="gi">问</span><span><span class="gt">快问快答</span><span class="gd"><span id="bankSize">…</span> 题随机 · 60 秒 · 连击加分</span></span></button>
         <button class="gcard" data-g="tl"><span class="gi">序</span><span><span class="gt">时间轴插卡</span><span class="gd">19 个事件 · 3 条命 · 插错掉命</span></span></button>
         <button class="gcard" data-g="as"><span class="gi">联</span><span><span class="gt">联想发散</span><span class="gd">9 个类目 · 45 秒 · 同类检索</span></span></button>
+        <button class="gcard" data-g="all"><span class="gi">通</span><span><span class="gt">通史卷</span><span class="gd">跨 12 个时期抽题 · 答错可直接跳过去看</span></span></button>
       </div>
     </div>
 
@@ -607,6 +659,7 @@
 <script src="data/ming.js"></script>
 <script src="data/yuan.js"></script>
 <script src="data/qing.js"></script>
+<script src="data/themes.js"></script>
 <script>
 /* ============================================================
    数据
@@ -874,6 +927,58 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape" && ovEl.classList.contains("on")) closeOverview();
 });
 
+/* 主题纵览 */
+let thCur = 0;
+function renderTheme(i) {
+  thCur = i;
+  const T = (window.THEMES || [])[i];
+  if (!T) return;
+  $("#thTabs").innerHTML = (window.THEMES || []).map((t, k) =>
+    '<button class="th-tab' + (k === i ? " on" : "") + '" data-k="' + k + '">' + t.name + "</button>").join("");
+  $("#thBody").innerHTML =
+    '<div class="th-head"><span class="th-name">' + T.name + '</span>' +
+      '<span class="th-sub">' + T.sub + "</span>" +
+      '<p class="th-lead">' + T.lead + "</p></div>" +
+    '<div class="th-list">' + T.nodes.map(n => {
+      const jump = n.d && DY[n.d];
+      return '<button class="th-node' + (jump ? "" : " gap") + '"' +
+        (jump ? ' data-d="' + n.d + '" data-y="' + n.y + '"' : "") + ' title="' +
+        (jump ? "跳到" + DY[n.d].meta.name + "对应章节" : "该政权暂无独立页面") + '">' +
+        '<span class="th-r1"><span class="th-y">' + fy(n.y) + "</span>" +
+        '<span class="th-dyn">' + n.dn + "</span>" +
+        '<span class="th-t">' + n.t + "</span></span>" +
+        '<span class="th-v">' + n.d2 + "</span></button>";
+    }).join("") + "</div>" +
+    '<div class="th-tail">' + T.tail + "</div>";
+}
+function openThemes() {
+  if (!window.THEMES || !window.THEMES.length) return;
+  renderTheme(thCur);
+  $("#th").classList.add("on");
+  document.body.style.overflow = "hidden";
+}
+function closeThemes() {
+  $("#th").classList.remove("on");
+  document.body.style.overflow = "";
+}
+$("#themeBtn").onclick = openThemes;
+$("#thClose").onclick = closeThemes;
+$("#th").addEventListener("click", e => {
+  if (e.target === $("#th")) { closeThemes(); return; }
+  const tab = e.target.closest(".th-tab");
+  if (tab) { renderTheme(+tab.dataset.k); return; }
+  const node = e.target.closest(".th-node");
+  if (!node || !node.dataset.d) return;
+  const id = node.dataset.d, y = +node.dataset.y;
+  closeThemes();
+  if (D && D.meta.id === id) { setTimeout(() => goChapter(chapterIndexOf(y)), 60); return; }
+  switchTo(id);
+  setTimeout(() => goChapter(chapterIndexOf(y)), 90);
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && $("#th").classList.contains("on")) closeThemes();
+});
+
 /* 切换朝代 */
 function switchTo(id) {
   if (!DY[id]) return;
@@ -1034,6 +1139,7 @@ document.addEventListener("keydown", e => {
     if (b.dataset.g === "quiz") runQuiz(QB, 60, "全部 " + QB.length + " 题");
     if (b.dataset.g === "tl") runTl();
     if (b.dataset.g === "as") runAs();
+    if (b.dataset.g === "all") runAll();
   });
 
   qs("#chapters").addEventListener("click", e => {
@@ -1052,12 +1158,14 @@ document.addEventListener("keydown", e => {
   function prepareQs(list) {
     return shuffle(list).map(q => {
       const order = shuffle(q.o.map((t, i) => i));
-      return { y: q.y, q: q.q, n: q.n, s: q.s, o: order.map(i => q.o[i]), a: order.indexOf(q.a) };
+      return { y: q.y, q: q.q, n: q.n, s: q.s, dyn: q.dyn, dname: q.dname,
+        o: order.map(i => q.o[i]), a: order.indexOf(q.a) };
     });
   }
 
-  function runQuiz(list, seconds, label) {
+  function runQuiz(list, seconds, label, title) {
     Q.list = prepareQs(list); Q.i = 0; Q.score = 0; Q.combo = 0; Q.right = 0; Q.total = 0;
+    Q.title = title || "快问快答";
     Q.wrong = []; Q.locked = false; Q.left = seconds; Q.span = seconds;
     qs("#qLabel").textContent = label;
     qs("#qTime").textContent = seconds + "s";
@@ -1072,7 +1180,7 @@ document.addEventListener("keydown", e => {
       qs("#qBar i").style.width = (Q.left / Q.span * 100) + "%";
       qs("#qTime").textContent = Math.ceil(Q.left) + "s";
     });
-    S.replay = () => runQuiz(list, seconds, label);
+    S.replay = () => runQuiz(list, seconds, label, title);
   }
 
   function paintQ() {
@@ -1107,12 +1215,14 @@ document.addEventListener("keydown", e => {
       Q.score += 10 + Math.min(Q.combo - 1, 5) * 2;
       qs("#qScore").textContent = Q.score;
       if (Q.combo > 1) { qs("#qCombo").textContent = "连击 ×" + Q.combo; qs("#qCombo").classList.add("on"); }
-      qs("#qFb").innerHTML = "<b>对。</b>" + q.n + '<span class="qsrc">' + q.s + "</span>";
+      qs("#qFb").innerHTML = "<b>对。</b>" + q.n + '<span class="qsrc">' + q.s + "</span>" +
+        (q.dname ? '<span class="qdyn">' + q.dname + "</span>" : "");
     } else {
       btns[i].classList.add("bad");
       Q.combo = 0; qs("#qCombo").classList.remove("on");
-      Q.wrong.push({ q: q.q, a: q.o[q.a], n: q.n, s: q.s });
-      qs("#qFb").innerHTML = "<b>错。</b>正解「" + q.o[q.a] + "」。" + q.n + '<span class="qsrc">' + q.s + "</span>";
+      Q.wrong.push({ q: q.q, a: q.o[q.a], n: q.n, s: q.s, y: q.y, dyn: q.dyn, dname: q.dname });
+      qs("#qFb").innerHTML = "<b>错。</b>正解「" + q.o[q.a] + "」。" + q.n + '<span class="qsrc">' + q.s + "</span>" +
+        (q.dname ? '<span class="qdyn">' + q.dname + "</span>" : "");
     }
     qs("#qNext").disabled = false;
   }
@@ -1137,9 +1247,31 @@ document.addEventListener("keydown", e => {
     if (Q.total === 0) { show("menu"); return; }
     const acc = Math.round(Q.right / Q.total * 100);
     const done = Q.i >= Q.list.length;
-    showResult("快问快答 · " + (done ? "全部答完" : "时间到"), Q.score,
+    showResult((Q.title || "快问快答") + " · " + (done ? "全部答完" : "时间到"), Q.score,
       "答对 " + Q.right + " / " + Q.total, "正确率 " + acc + "%", Q.wrong, S.replay);
   }
+
+  /* ---------------- 通史卷（跨朝代） ---------------- */
+  function runAll() {
+    const ids = Object.keys(DY).filter(k => DY[k] && DY[k].questions && DY[k].questions.length);
+    const picks = shuffle(ids).slice(0, 12);
+    const pool = picks.map(id => {
+      const list = DY[id].questions;
+      const q = list[Math.floor(Math.random() * list.length)];
+      return Object.assign({}, q, { dyn: id, dname: DY[id].meta.name });
+    });
+    runQuiz(pool, Math.max(60, pool.length * 6), "通史卷 · " + pool.length + " 个时期", "通史卷");
+    S.replay = runAll;
+  }
+
+  qs("#resReview").addEventListener("click", e => {
+    const b = e.target.closest(".rgo");
+    if (!b) return;
+    const id = b.dataset.d, y = +b.dataset.y;
+    close();
+    if (D && D.meta.id !== id) switchTo(id);
+    setTimeout(() => goChapter(chapterIndexOf(y)), 120);
+  });
 
   /* ---------------- 时间轴插卡 ---------------- */
   const T = { placed: [], picked: [], cur: null, lives: 3, locked: false };
@@ -1295,7 +1427,9 @@ document.addEventListener("keydown", e => {
     qs("#resReview").innerHTML = wrong && wrong.length
       ? '<div class="rlabel">错题回顾</div>' + wrong.map(w =>
           '<div class="ritem"><div class="rq">' + w.q + '</div><div class="ra">✓ ' + w.a + "</div>" +
-          '<div class="rn">' + w.n + ' <span class="qsrc">' + w.s + "</span></div></div>").join("")
+          '<div class="rn">' + w.n + ' <span class="qsrc">' + w.s + "</span></div>" +
+          (w.dyn ? '<button class="rgo" data-d="' + w.dyn + '" data-y="' + w.y + '">去' + w.dname + "看这一节 →</button>" : "") +
+          "</div>").join("")
       : "";
     qs("#resAgain").onclick = again || (() => show("menu"));
     show("res");
