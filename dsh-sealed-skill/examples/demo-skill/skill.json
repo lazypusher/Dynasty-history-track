@@ -1,0 +1,30 @@
+{
+  "name": "complaint-triage",
+  "description": "客诉工单分诊：对客户投诉工单做分级、定责与处置建议，并给出对外沟通口径。",
+  "whenToUse": "用户提供客诉工单文本，或要求对投诉做分级、定责、处置建议时。",
+  "contentFile": "SKILL.md",
+  "scripts": [
+    {
+      "id": "plan",
+      "lang": "python",
+      "file": "scripts/plan.py",
+      "description": "推进分诊流程：传入已完成的步骤 id 数组，返回下一个动作"
+    },
+    {
+      "id": "classify",
+      "lang": "python",
+      "file": "scripts/classify.py",
+      "description": "对工单文本分级与定责打分，参数为工单文本与客户等级"
+    },
+    {
+      "id": "respond",
+      "lang": "python",
+      "file": "scripts/respond.py",
+      "description": "按分级与客户等级生成处置动作与对外话术"
+    }
+  ],
+  "docs": [
+    { "id": "sla", "title": "SLA 与升级阈值", "file": "docs/sla.md" },
+    { "id": "tone", "title": "对外沟通口径", "file": "docs/tone.md" }
+  ]
+}

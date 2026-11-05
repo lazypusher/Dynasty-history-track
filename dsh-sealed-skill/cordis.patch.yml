@@ -1,0 +1,21 @@
+# Bundle layer for @yourco/dsh-skill-sealed.
+#
+# This package is both a bundle (dsh.bundle.patch) and the Cordis plugin that
+# provides the sealed skill. Installing it into a profile adds this row; the
+# plugin then registers a skill provider and the sealed_* tools.
+#
+# The pack is ciphertext. Never place the plaintext skill tree in the customer
+# image: build it in your own CI, ship only assets/*.pack.
+- insert:
+    - id: skill-sealed
+      name: '@yourco/dsh-skill-sealed'
+      config:
+        packPath: assets/demo.pack
+        # providerName: sealed
+        # rank: 600
+        # timeoutMs: 120000
+        #
+        # Pick ONE key source:
+        #   keyFile: assets/demo.key   (machine-bound, written by bin/seal.mjs
+        #                               --write-keyfile; best for offline sites)
+        #   env DSH_SEAL_KEY=...       (development only)
