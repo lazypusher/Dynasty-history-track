@@ -487,6 +487,12 @@
   .chat-cfg p{font-size:11.5px;color:#a58e71;line-height:1.7;margin:2px 0 0}
   .chat-cfg .save{background:var(--ink);color:#f6eee2;border:none;border-radius:8px;padding:9px;
     font-family:inherit;font-size:13px;letter-spacing:1px;cursor:pointer;margin-top:4px}
+  .chat-cfg .save.ghost{background:none;color:var(--ink2);border:1px solid var(--line);margin-top:0}
+  .chat-cfg .cfgnote{color:#8a7358}
+  .chat-cfg pre.cfgsnip{background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 10px;
+    font-size:11px;line-height:1.6;color:var(--ink2);overflow:auto;max-height:120px;margin:0;white-space:pre-wrap}
+  .chat .daydiv{align-self:center;font-size:10.5px;color:#b3a08a;letter-spacing:2px;margin:2px 0}
+  .chat-ico.warn{color:var(--red)}
   @media (max-width:520px){
     .chat{right:10px;left:10px;width:auto;bottom:80px;height:min(520px,calc(100vh - 100px))}
     .chatfab{right:14px;bottom:14px}
@@ -722,6 +728,7 @@
     <span class="chat-name">史官</span>
     <span class="chat-state" id="chatState">未配置</span>
     <span class="sp"></span>
+    <button class="chat-ico" id="chatClear" title="清空对话">🗑</button>
     <button class="chat-ico" id="chatCfgBtn" title="设置">⚙</button>
     <button class="chat-ico" id="chatClose" title="收起">×</button>
   </div>
@@ -738,8 +745,11 @@
       <div><label>接口地址</label><input id="cfgBase" type="text"></div>
       <div style="max-width:38%"><label>模型</label><input id="cfgModel" type="text"></div>
     </div>
-    <p>默认走 DeepSeek：<code>https://api.deepseek.com</code> + <code>deepseek-chat</code>。Key 只保存在这台机器的浏览器里，不会写进代码或仓库。</p>
+    <p>默认走 DeepSeek：<code>https://api.deepseek.com</code> + <code>deepseek-chat</code>。Key 存在本机浏览器（localStorage），不会进仓库。</p>
+    <p class="cfgnote">换电脑、换端口、或浏览器清了缓存，Key 会丢。想一劳永逸：在 <code>tang-map/</code> 下新建 <code>chat-config.js</code>，内容如下（已被 .gitignore 忽略）：</p>
+    <pre class="cfgsnip" id="cfgSnip"></pre>
     <button class="save" id="cfgSave">保存并开始</button>
+    <button class="save ghost" id="cfgCopy">复制上面这段</button>
   </div>
 </div>
 
@@ -1586,8 +1596,37 @@ document.addEventListener("keydown", e => {
   try { Object.assign(cfg, JSON.parse(localStorage.getItem(LS) || "{}")); } catch (e) {}
   if (window.CHAT_CONFIG) Object.assign(cfg, window.CHAT_CONFIG);
 
-  const hist = [];
+  let hist = [];
   let busy = false;
+
+  /* ---------- 持久化 ---------- */
+  const LS_HIST = "dshchat.hist";
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { try { return sessionStorage.getItem(k); } catch (e2) { return null; } } },
+    set(k, v) {
+      try { localStorage.setItem(k, v); return true; }
+      catch (e) { try { sessionStorage.setItem(k, v); return false; } catch (e2) { return false; } }
+    },
+    del(k) { try { localStorage.removeItem(k); } catch (e) {} try { sessionStorage.removeItem(k); } catch (e) {} }
+  };
+  function loadHist() {
+    try {
+      const a = JSON.parse(store.get(LS_HIST) || "[]");
+      if (Array.isArray(a)) hist = a.filter(m => m && m.role && typeof m.content === "string").slice(-40);
+    } catch (e) { hist = []; }
+  }
+  function saveHist() {
+    try {
+      const keep = hist.slice(-40).map(m => ({ role: m.role, content: m.content, ts: m.ts }));
+      store.set(LS_HIST, JSON.stringify(keep));
+    } catch (e) {}
+  }
+  function dayLabel(ts) {
+    if (!ts) return "";
+    const d = new Date(ts), n = new Date();
+    const same = d.toDateString() === n.toDateString();
+    return same ? "今天" : (d.getMonth() + 1) + "月" + d.getDate() + "日";
+  }
 
   const DYN_IDS = "xia,shang,zhou,chunqiu,zhanguo,qin,han,sanguo,jin,sui,tang,wudai,song,liao,jin2,yuan,ming,qing";
   const SYS = () => [
@@ -1619,6 +1658,7 @@ document.addEventListener("keydown", e => {
     fab.classList.add("hide");
     if (!cfg.key) showCfg(true);
     else if (!hist.length) hello();
+    else if (!body.children.length) renderHistory();
     setTimeout(() => text.focus(), 60);
     body.scrollTop = body.scrollHeight;
   }
@@ -1636,6 +1676,8 @@ document.addEventListener("keydown", e => {
       q("#cfgModel").value = cfg.model || DEF.model;
       q("#chatState").textContent = "未配置";
       q("#chatDot").classList.remove("live");
+      q("#cfgSnip").textContent = 'window.CHAT_CONFIG = {\n  key: "' + (cfg.key || "sk-...") + '",\n  base: "' +
+        (cfg.base || DEF.base) + '",\n  model: "' + (cfg.model || DEF.model) + '"\n};';
     }
   }
   function state() {
@@ -1653,6 +1695,17 @@ document.addEventListener("keydown", e => {
   }
   function hello() {
     addMsg("a", "我是史官。可以问我这一章讲了什么、某个事件的因果，或者让我带你去某一朝、某一章。");
+  }
+  function renderHistory() {
+    body.innerHTML = "";
+    if (!hist.length) return;
+    const last = hist[hist.length - 1];
+    const div = document.createElement("div");
+    div.className = "daydiv";
+    div.textContent = "上次对话 · " + (dayLabel(last.ts) || "已保存");
+    body.appendChild(div);
+    hist.forEach(m => addMsg(m.role === "user" ? "u" : "a", m.content));
+    body.scrollTop = body.scrollHeight;
   }
 
   /* ---------- 调用 ---------- */
@@ -1744,7 +1797,8 @@ document.addEventListener("keydown", e => {
     if (!cfg.key) { showCfg(true); return; }
     text.value = "";
     addMsg("u", val);
-    hist.push({ role: "user", content: val });
+    hist.push({ role: "user", content: val, ts: Date.now() });
+    saveHist();
     const bubble = addMsg("a", "…");
     bubble.classList.add("streaming");
     busy = true; sendBtn.disabled = true;
@@ -1759,7 +1813,8 @@ document.addEventListener("keydown", e => {
       });
       const { text: shown, act } = splitAction(bubble.textContent || out);
       bubble.textContent = shown || "（空回复）";
-      hist.push({ role: "assistant", content: shown });
+      hist.push({ role: "assistant", content: shown, ts: Date.now() });
+      saveHist();
       const note = runAction(act);
       if (note) {
         const d = document.createElement("div");
@@ -1790,6 +1845,21 @@ document.addEventListener("keydown", e => {
   fab.onclick = openChat;
   q("#chatClose").onclick = closeChat;
   q("#chatCfgBtn").onclick = () => showCfg(!cfgBox.classList.contains("on"));
+  q("#chatClear").onclick = () => {
+    if (!hist.length) return;
+    if (!confirm("清空全部对话记录？")) return;
+    hist = [];
+    saveHist();
+    body.innerHTML = "";
+    hello();
+  };
+  q("#cfgCopy").onclick = () => {
+    const txt = q("#cfgSnip").textContent;
+    navigator.clipboard && navigator.clipboard.writeText(txt).then(
+      () => { q("#cfgCopy").textContent = "已复制"; setTimeout(() => q("#cfgCopy").textContent = "复制上面这段", 1400); },
+      () => {}
+    );
+  };
   q("#cfgSave").onclick = () => {
     cfg.key = q("#cfgKey").value.trim();
     cfg.base = q("#cfgBase").value.trim() || DEF.base;
@@ -1817,6 +1887,22 @@ document.addEventListener("keydown", e => {
     text.focus();
   });
 
+  /* 可选：本地 chat-config.js（不进仓库） */
+  (function loadFileCfg() {
+    const sc = document.createElement("script");
+    sc.src = "chat-config.js";
+    sc.onload = () => {
+      if (window.CHAT_CONFIG) {
+        Object.assign(cfg, window.CHAT_CONFIG);
+        state();
+        if (chat.classList.contains("on") && !cfgBox.classList.contains("on")) showCfg(false);
+      }
+    };
+    sc.onerror = () => {};
+    document.head.appendChild(sc);
+  })();
+
+  loadHist();
   state();
 })();
 

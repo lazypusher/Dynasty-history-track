@@ -425,6 +425,21 @@ try {
   await sleep(250);
   check("esc closes chat", await ev("!document.getElementById('chat').classList.contains('on')"));
 
+  /* ---- 助手：配置与历史持久化 ---- */
+  await ev("location.reload()");
+  await sleep(2200);
+  await ev("document.getElementById('chatFab').click()");
+  await sleep(500);
+  check("chat config survives reload", (await ev("document.getElementById('chatState').textContent")).indexOf("已就绪") === 0);
+  check("chat history survives reload", await ev("document.querySelectorAll('#chatBody .msg').length") >= 2);
+  check("chat restore divider", await ev("!!document.querySelector('.daydiv')"));
+  await ev("window.confirm = () => true; document.getElementById('chatClear').click()");
+  await sleep(300);
+  check("chat clear empties history", await ev("document.querySelectorAll('#chatBody .msg').length") === 1);
+  check("chat clear wipes storage", (await ev("localStorage.getItem('dshchat.hist')")) === "[]");
+  await ev("document.getElementById('chatClose').click()");
+  await sleep(200);
+
   check("no page errors", errors.length === 0, errors);
 
   console.log("PASS " + ok.length);
