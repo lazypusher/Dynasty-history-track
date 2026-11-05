@@ -1,7 +1,25 @@
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import http from "node:http";
 import { pathToFileURL } from "node:url";
+
+/* 假 LLM：验证流式解析与动作块 */
+const llm = http.createServer((req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "content-type,authorization");
+  res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
+  if (req.method === "OPTIONS") { res.writeHead(204); res.end(); return; }
+  req.on("data", () => {});
+  req.on("end", () => {
+    res.writeHead(200, { "Content-Type": "text/event-stream" });
+    const chunks = ["贞观之治靠的是", "均田与纳谏。\n", "```do\n{\"act\":\"goto\",\"dyn\":\"han\",\"chapter\":2}\n```"];
+    for (const c of chunks) res.write("data: " + JSON.stringify({ choices: [{ delta: { content: c } }] }) + "\n\n");
+    res.write("data: [DONE]\n\n");
+    res.end();
+  });
+});
+await new Promise(r => llm.listen(8797, "127.0.0.1", r));
 
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const DIR = process.cwd();
@@ -383,6 +401,30 @@ try {
   await ev("(()=>{const b=[...document.querySelectorAll('.dynachip')].find(x=>x.textContent==='唐'); b.click();})()");
   await sleep(600);
 
+
+  /* ---- 助手 ---- */
+  await ev("document.getElementById('chatFab').click()");
+  await sleep(350);
+  check("chat panel opens", await ev("document.getElementById('chat').classList.contains('on')"));
+  check("chat asks for key first", await ev("document.getElementById('chatCfg').classList.contains('on')"));
+  check("chat fab hidden while open", await ev("document.getElementById('chatFab').classList.contains('hide')"));
+  await ev("document.getElementById('cfgKey').value='sk-e2e'");
+  await ev("document.getElementById('cfgBase').value='http://127.0.0.1:8797'");
+  await ev("document.getElementById('cfgSave').click()");
+  await sleep(300);
+  check("chat ready after save", (await ev("document.getElementById('chatState').textContent")).indexOf("已就绪") === 0);
+  check("chat greeting shown", await ev("document.querySelectorAll('#chatBody .msg.a').length") >= 1);
+  await ev("(()=>{const b=document.querySelector('#chatQuick button'); b.click();})()");
+  check("quick prompt fills input", (await ev("document.getElementById('chatText').value")).length > 0);
+  await ev("document.getElementById('chatText').value='贞观之治'; document.getElementById('chatSend').click()");
+  await sleep(1600);
+  check("chat streams answer", (await ev("document.querySelector('#chatBody .msg.a:last-child').textContent")).indexOf("均田") >= 0);
+  check("chat executes action", await ev("D.meta.id") === "han");
+  check("chat shows action note", (await ev("document.querySelector('#chatBody .act')?.textContent || ''")).indexOf("已跳到") >= 0);
+  await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
+  await sleep(250);
+  check("esc closes chat", await ev("!document.getElementById('chat').classList.contains('on')"));
+
   check("no page errors", errors.length === 0, errors);
 
   console.log("PASS " + ok.length);
@@ -395,6 +437,7 @@ try {
 } finally {
   try { ws && ws.close(); } catch (e) {}
   proc.kill();
+  llm.close();
   await sleep(300);
   fs.rmSync(PROFILE, { recursive: true, force: true });
 }
