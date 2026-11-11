@@ -38,6 +38,26 @@ for (const [id, d] of Object.entries(dyns)) {
     if (!(i in d.questions) || !d.questions[i] || !d.questions[i].q) say(id, "questions 第 " + i + " 项为空位");
   }
 
+  // 卡片补充字段：生卒 / 起止 / 落幕
+  const LIFE_RE = /^(约)?(\?|\d{1,4})(–|—)(\?|\d{1,4})$/;
+  const lifeOk = v => typeof v === "string" && v.split(" / ").every(x => LIFE_RE.test(x));
+  d.chapters.forEach(c => {
+    c.items.forEach(it => {
+      if (it.life !== undefined && !lifeOk(it.life))
+        say(id, c.id + " 「" + it.t + "」life 格式应为「701–761」，可用「 / 」并列两人");
+      if (it.to !== undefined) {
+        if (typeof it.to !== "number" || it.to < it.y) say(id, c.id + " 「" + it.t + "」to 不能早于 y");
+        if (!it.end) say(id, c.id + " 「" + it.t + "」有 to 但缺 end（落幕说明）");
+      }
+      if (it.end && it.to === undefined) say(id, c.id + " 「" + it.t + "」有 end 但缺 to");
+      if (it.rel !== undefined && !it.rel) say(id, c.id + " 「" + it.t + "」rel 为空");
+    });
+  });
+  d.emps.forEach(e => {
+    if (e.life !== undefined && !lifeOk(e.life))
+      say(id, "君主 " + e.n + " 的 life 格式应为「598–649」");
+  });
+
   // 章节
   d.chapters.forEach((c, i) => {
     if (i && c.s <= d.chapters[i - 1].s) say(id, c.id + " 起始年未递增");

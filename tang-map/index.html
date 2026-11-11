@@ -436,6 +436,18 @@
   @media (max-width:1100px){.rail{display:none}}
 
 
+
+  .mquick{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;padding-bottom:10px;
+    border-bottom:1px dashed var(--line)}
+  .mquick .mq{display:flex;gap:10px;font-size:12.5px;line-height:1.7}
+  .mquick .mk{flex:0 0 42px;color:#a58e71;letter-spacing:1px}
+  .mquick .mv{color:var(--ink);flex:1}
+  .it .it-meta{display:block;font-size:10.5px;color:#a9834a;letter-spacing:.3px;margin-top:1px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tl-item .lifespan{font-size:10.5px;color:#96703c;letter-spacing:.2px}
+  .tl-item .esub{display:block;font-size:10.5px;color:#8a7358;line-height:1.5;margin-top:3px}
+  .tl-item.L .esub{text-align:right}
+
   /* ---------- 助手 ---------- */
   .chatfab{position:fixed;right:22px;bottom:22px;z-index:80;width:54px;height:54px;border-radius:50%;
     background:var(--red);color:#fff;border:none;cursor:pointer;font-family:inherit;
@@ -852,6 +864,7 @@ function renderAll() {
       <span class="tl-mid"><span class="tdot"></span></span>
       <span class="tl-card">
         <span class="row1"><span class="yr">${fy(e.y0)}–${fy(e.y1)}</span><span class="nm"><b>${e.n}</b><span class="pn">${e.p}</span>${rg}${al}</span></span>
+        ${(e.life || e.rel) ? '<span class="esub">' + [e.life || "", e.rel || ""].filter(Boolean).join(" · ") + '</span>' : ""}
         <span class="tags">${tags}</span>
       </span>
     </button>`;
@@ -873,6 +886,7 @@ function renderAll() {
           <button class="it k-${it.k}${(it.th || []).map(t => " t-" + t).join("")}" data-c="${c.id}" data-j="${j}" style="--j:${j}">
             <span class="top"><span class="iy">${fy(it.y)}</span><span class="ik">${KIND[it.k]}</span></span>
             <span class="it-t">${it.t}</span>
+            ${cardMeta(it) ? '<span class="it-meta">' + cardMeta(it) + '</span>' : ""}
             <span class="it-d">${it.d}</span>
             ${it.mus ? '<span class="it-mus">' + it.mus + "</span>" : ""}
           </button>`).join("")}
@@ -1198,6 +1212,24 @@ $("#mBody").addEventListener("click", e => {
 
 /* 弹窗 */
 const mask = $("#mask");
+function cardMeta(it) {
+  if (it.to && it.to !== it.y) {
+    const n = Math.abs(it.to - it.y);
+    return fy(it.y) + "–" + fy(it.to) + " · " + n + " 年";
+  }
+  if (it.life) return it.life + (it.alias ? " · " + it.alias : "");
+  if (it.alias) return it.alias;
+  return "";
+}
+function metaRows(it) {
+  const rows = [];
+  if (it.life) rows.push(["生卒", it.life]);
+  if (it.alias) rows.push(["称号", it.alias]);
+  if (it.rel) rows.push(["关系", it.rel]);
+  if (it.to && it.to !== it.y) rows.push(["起止", fy(it.y) + " — " + fy(it.to) + "（历时 " + Math.abs(it.to - it.y) + " 年）"]);
+  if (it.end) rows.push(["落幕", it.end]);
+  return rows;
+}
 function openItem(cid, j) {
   const c = CH.find(x => x.id === cid);
   const it = c.items[j];
@@ -1218,7 +1250,12 @@ function openItem(cid, j) {
       setTimeout(() => { if (!img.complete || img.naturalWidth === 0) img.parentNode.classList.add("noimg"); }, 2500);
     });
   } else {
-    $("#mBody").innerHTML = '<div class="mtext">' + it.d + "</div>";
+    const rows = metaRows(it);
+    const head = rows.length
+      ? '<div class="mquick">' + rows.map(r =>
+          '<div class="mq"><span class="mk">' + r[0] + '</span><span class="mv">' + r[1] + "</span></div>").join("") + "</div>"
+      : "";
+    $("#mBody").innerHTML = head + '<div class="mtext">' + it.d + "</div>";
   }
   const others = c.items.filter((x, k) => k !== j);
   $("#mRel").innerHTML = `<div class="rl">同一时期</div><div class="tags">` +
